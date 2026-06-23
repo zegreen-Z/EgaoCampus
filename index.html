@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校园抽象模拟器</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--bg4:#2a2f44;
+    --border:#ffffff18;--border2:#ffffff30;
+    --text:#e8eaf0;--text2:#9ba3b8;--text3:#6b7590;
+    --green:#4ade80;--green2:#22c55e;--green-dim:#1a3a25;
+    --yellow:#fbbf24;--yellow-dim:#3a2e10;
+    --cyan:#22d3ee;--cyan-dim:#0e2e36;
+    --red:#f87171;--red-dim:#3a1818;
+    --purple:#c084fc;--purple-dim:#2d1a3a;
+    --gray:#6b7590;--white:#ffffff;
+    --accent:#6366f1;--accent2:#818cf8;
+    --radius:12px;--radius-sm:8px;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+  #app{width:100%;max-width:700px;}
+
+  .screen{display:none;animation:fadeIn .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── MENU ── */
+  .menu-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:48px 40px;text-align:center;}
+  .game-title{font-size:28px;font-weight:700;letter-spacing:2px;color:var(--yellow);margin-bottom:6px;}
+  .game-sub{font-size:13px;color:var(--text3);letter-spacing:4px;margin-bottom:36px;}
+  .menu-btns{display:flex;flex-direction:column;gap:12px;max-width:260px;margin:0 auto 28px;}
+  .btn{display:block;width:100%;padding:12px 20px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;font-size:15px;font-family:inherit;transition:all .15s;text-align:center;}
+  .btn:hover{background:var(--bg4);border-color:var(--border2);color:var(--white);}
+  .btn.green{border-color:var(--green2);color:var(--green);}
+  .btn.green:hover{background:var(--green-dim);}
+  .btn.yellow{border-color:var(--yellow);color:var(--yellow);}
+  .btn.yellow:hover{background:var(--yellow-dim);}
+  .btn.cyan{border-color:var(--cyan);color:var(--cyan);}
+  .btn.cyan:hover{background:var(--cyan-dim);}
+  .btn.red{border-color:var(--red);color:var(--red);}
+  .btn.red:hover{background:var(--red-dim);}
+  .btn.accent{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.accent:hover{background:var(--accent2);border-color:var(--accent2);}
+  .btn.purple{border-color:var(--purple);color:var(--purple);}
+  .btn.purple:hover{background:var(--purple-dim);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .menu-version{color:var(--text3);font-size:12px;}
+
+  /* ── STATS BAR ── */
+  .stats-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .stat-item{text-align:center;}
+  .stat-label{font-size:11px;color:var(--text3);margin-bottom:2px;}
+  .stat-val{font-size:15px;font-weight:600;}
+  .stat-bar-wrap{height:4px;background:var(--bg4);border-radius:2px;margin-top:3px;}
+  .stat-bar-fill{height:4px;border-radius:2px;transition:width .4s ease;}
+
+  /* ── HEADER ── */
+  .game-header{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+  .day-phase{font-size:14px;font-weight:600;color:var(--cyan);}
+  .header-right{display:flex;gap:8px;align-items:center;}
+  .ks-badge{background:var(--purple-dim);border:1px solid var(--purple);color:var(--purple);border-radius:4px;padding:2px 8px;font-size:12px;}
+
+  /* ── STORY CARD ── */
+  .story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:12px;}
+  .story-title{font-size:17px;font-weight:700;margin-bottom:14px;color:var(--white);}
+  .story-title.green{color:var(--green);}
+  .story-title.yellow{color:var(--yellow);}
+  .story-title.cyan{color:var(--cyan);}
+  .story-title.purple{color:var(--purple);}
+  .story-title.red{color:var(--red);}
+  .story-desc{color:var(--text2);font-size:14px;line-height:1.85;white-space:pre-wrap;}
+  .story-sep{border:none;border-top:1px solid var(--border);margin:16px 0;}
+
+  /* ── CHOICE BTNS ── */
+  .choices{display:flex;flex-direction:column;gap:10px;}
+  .choice-btn{display:block;width:100%;padding:13px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;font-size:14px;font-family:inherit;text-align:left;transition:all .15s;line-height:1.5;}
+  .choice-btn:hover{background:var(--bg4);border-color:var(--accent2);color:var(--white);}
+  .choice-btn.highlight:hover{background:var(--green-dim);border-color:var(--green2);color:var(--green);}
+
+  /* ── RESULT LOG ── */
+  .result-log{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:12px;font-size:14px;line-height:1.8;}
+  .log-line{display:flex;align-items:baseline;gap:8px;margin-bottom:3px;}
+  .log-line:last-child{margin-bottom:0;}
+  .log-icon{font-size:13px;min-width:16px;}
+  .t-green{color:var(--green);}
+  .t-red{color:var(--red);}
+  .t-yellow{color:var(--yellow);}
+  .t-cyan{color:var(--cyan);}
+  .t-purple{color:var(--purple);}
+  .t-gray{color:var(--gray);}
+
+  /* ── STATUS SCREEN ── */
+  .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .status-cell{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;}
+  .status-cell-label{font-size:12px;color:var(--text3);margin-bottom:6px;}
+  .status-cell-val{font-size:22px;font-weight:700;}
+  .bar-wrap{height:6px;background:var(--bg4);border-radius:3px;margin-top:6px;}
+  .bar-fill{height:6px;border-radius:3px;transition:width .5s ease;}
+  .events-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+  .event-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;text-align:center;font-size:12px;}
+  .event-chip.done{border-color:var(--green2);background:var(--green-dim);color:var(--green);}
+  .event-chip.undone{color:var(--text3);}
+
+  /* ── HELP ── */
+  .help-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+  .help-section{margin-bottom:20px;}
+  .help-section h3{font-size:14px;font-weight:600;color:var(--cyan);margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+  .help-row{display:flex;gap:12px;font-size:13px;color:var(--text2);padding:4px 0;}
+  .help-key{color:var(--yellow);min-width:80px;font-weight:500;}
+  .help-desc pre{white-space:pre-wrap;color:var(--text2);font-family:inherit;font-size:13px;line-height:1.75;}
+
+  /* ── ENDING ── */
+  .ending-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:40px;text-align:center;}
+  .ending-title{font-size:26px;font-weight:700;margin-bottom:8px;}
+  .ending-sub{font-size:13px;color:var(--text3);margin-bottom:28px;letter-spacing:2px;}
+  .ending-text{text-align:left;background:var(--bg3);border-radius:var(--radius-sm);padding:18px;margin-bottom:24px;}
+  .ending-text p{font-size:14px;color:var(--text2);line-height:1.9;margin-bottom:8px;}
+  .ending-text p:last-child{margin-bottom:0;}
+  .ending-stats{display:flex;gap:16px;justify-content:center;margin-bottom:28px;font-size:14px;color:var(--text3);}
+  .ending-stats span{color:var(--cyan);}
+
+  /* ── INTRO ── */
+  .intro-lines{min-height:80px;}
+  .intro-line{font-size:15px;color:var(--text2);line-height:1.9;padding:4px 0;opacity:0;animation:fadeInLine .6s ease forwards;}
+  @keyframes fadeInLine{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+
+  /* ── SAVE/LOAD ── */
+  .save-slot{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .save-info{flex:1;}
+  .save-name{font-size:14px;font-weight:600;margin-bottom:2px;}
+  .save-meta{font-size:12px;color:var(--text3);}
+  .save-actions{display:flex;gap:8px;}
+  .btn-sm{padding:6px 14px;font-size:13px;border-radius:6px;border:1px solid var(--border2);background:var(--bg4);color:var(--text);cursor:pointer;font-family:inherit;transition:all .15s;}
+  .btn-sm:hover{background:var(--bg3);color:var(--white);}
+  .btn-sm.danger{color:var(--red);}
+  .btn-sm.danger:hover{background:var(--red-dim);border-color:var(--red);}
+
+  .title-badge{background:var(--purple-dim);border:1px solid var(--purple);color:var(--purple);border-radius:4px;padding:3px 10px;font-size:13px;display:inline-block;margin-top:8px;}
+
+  .mini-hint{font-size:12px;color:var(--text3);text-align:center;padding:6px 0;}
+
+  @media(max-width:480px){
+    .stats-bar{grid-template-columns:repeat(2,1fr);}
+    .status-grid{grid-template-columns:1fr;}
+    .events-grid{grid-template-columns:repeat(2,1fr);}
+    .menu-box{padding:32px 20px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ════════════ SCREEN: MENU ════════════ -->
+<div id="s-menu" class="screen active">
+  <div class="menu-box">
+    <div class="game-title">校园抽象模拟器</div>
+    <div class="game-sub">Campus Abstract Simulator</div>
+    <div class="menu-btns">
+      <button class="btn green" onclick="G.newGame()">开始新游戏</button>
+      <button class="btn yellow" onclick="showScreen('s-load')">读取存档</button>
+      <button class="btn cyan" onclick="showScreen('s-help')">游戏说明</button>
+      <button class="btn red" onclick="if(confirm('确定退出？'))window.close()">退出游戏</button>
+    </div>
+    <div class="menu-version">v4.0 Web Edition · 基于 story.json</div>
+  </div>
+</div>
+
+<!-- ════════════ SCREEN: HELP ════════════ -->
+<div id="s-help" class="screen">
+  <div class="help-box">
+    <div class="story-title" style="margin-bottom:20px;">游戏说明</div>
+    <div class="help-section">
+      <h3>日程安排</h3>
+      <div class="help-row"><span class="help-key">上午</span><span>上课（认真听课可增加学识，走神则无收获）</span></div>
+      <div class="help-row"><span class="help-key">下午</span><span>自习（累计3次随机触发图书馆事件）/ 兼职打工</span></div>
+      <div class="help-row"><span class="help-key">傍晚</span><span>闲逛（买鸭腿 / 偶遇奇人）</span></div>
+      <div class="help-row"><span class="help-key">晚上</span><span>宿舍（聊天、休息、或熬夜学习）</span></div>
+    </div>
+    <div class="help-section">
+      <h3>四大数值</h3>
+      <div class="help-row"><span class="help-key t-green">心情</span><span>归零触发天台吹风（仅一次），再归零则脆皮结局</span></div>
+      <div class="help-row"><span class="help-key t-yellow">精力</span><span>归零即「脆皮大学生」结局</span></div>
+      <div class="help-row"><span class="help-key t-cyan">金钱</span><span>归零即「财务管理大师」结局</span></div>
+      <div class="help-row"><span class="help-key t-purple">学识</span><span>上课认真听讲或熬夜学习可提升</span></div>
+    </div>
+    <div class="help-section">
+      <h3>道具</h3>
+      <div class="help-row"><span class="help-key t-purple">刀盾(耐3)</span><span>在道歉事件和占座事件中可免疫损失</span></div>
+    </div>
+    <div class="help-section">
+      <h3>结局条件</h3>
+      <div class="help-row"><span class="help-key t-red">脆皮结局</span><span>精力 ≤ 0</span></div>
+      <div class="help-row"><span class="help-key t-red">破产结局</span><span>金钱 = 0</span></div>
+      <div class="help-row"><span class="help-key t-green">大师结局</span><span>心情&精力均≤5 且 完成所有主线事件</span></div>
+    </div>
+    <button class="btn" onclick="showScreen('s-menu')">返回主菜单</button>
+  </div>
+</div>
+
+<!-- ════════════ SCREEN: LOAD ════════════ -->
+<div id="s-load" class="screen">
+  <div class="story-card">
+    <div class="story-title">读取 / 管理存档</div>
+    <div id="save-slots-load"></div>
+    <div style="margin-top:8px;">
+      <button class="btn" onclick="showScreen('s-menu')">返回</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ SCREEN: SAVE ════════════ -->
+<div id="s-save" class="screen">
+  <div class="story-card">
+    <div class="story-title">保存游戏</div>
+    <div id="save-slots-save"></div>
+    <div style="margin-top:8px;">
+      <button class="btn" onclick="G.resumeGame()">返回游戏</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ SCREEN: STATUS ════════════ -->
+<div id="s-status" class="screen">
+  <div id="status-content"></div>
+  <button class="btn" onclick="G.resumeGame()" style="margin-top:4px;">返回游戏</button>
+</div>
+
+<!-- ════════════ SCREEN: INTRO ════════════ -->
+<div id="s-intro" class="screen">
+  <div class="story-card">
+    <div class="story-title t-yellow">新学期开始了</div>
+    <div class="intro-lines" id="intro-lines"></div>
+    <hr class="story-sep">
+    <div class="result-log" id="intro-kit"></div>
+    <button class="btn accent" id="intro-next-btn" style="display:none;margin-top:12px;" onclick="G.startLoop()">开始大学生活 →</button>
+  </div>
+</div>
+
+<!-- ════════════ SCREEN: GAME ════════════ -->
+<div id="s-game" class="screen">
+  <div class="game-header">
+    <div class="day-phase" id="day-phase-label">第1天 · 上午 · 上课</div>
+    <div class="header-right">
+      <span class="ks-badge" id="ks-badge" style="display:none;">刀盾 <span id="ks-dur">3</span></span>
+      <button class="btn-sm" onclick="G.openStatus()">状态</button>
+      <button class="btn-sm" onclick="G.openSave()">存档</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-label">心情</div>
+      <div class="stat-val t-green" id="s-mood">50</div>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="b-mood" style="background:var(--green);width:50%"></div></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">精力</div>
+      <div class="stat-val t-yellow" id="s-nrg">55</div>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="b-nrg" style="background:var(--yellow);width:55%"></div></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">金钱</div>
+      <div class="stat-val t-cyan" id="s-money">¥400</div>
+      <div class="stat-bar-wrap" style="display:none;"></div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">学识</div>
+      <div class="stat-val t-purple" id="s-kn">0</div>
+      <div class="stat-bar-wrap" style="display:none;"></div>
+    </div>
+  </div>
+  <div id="game-content"></div>
+</div>
+
+<!-- ════════════ SCREEN: ENDING ════════════ -->
+<div id="s-ending" class="screen">
+  <div class="ending-box" id="ending-box"></div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ══════════════════════════════════════════
+//  STORY DATA (embedded from story.json)
+// ══════════════════════════════════════════
+const STORY = {
+  meta:{
+    title:"校园抽象模拟器",
+    subtitle:"Campus Abstract Simulator",
+    knifeShattered:"刀盾碎了，但精神永存",
+    help:"",
+    intro:[
+      "新学期开始了。你背着书包走进校园。",
+      "阳光很好，树叶沙沙响。你对即将到来的一切一无所知。",
+      "（你的口袋里有一面刀盾。别问为什么。）"
+    ]
+  },
+  settings:{maxStat:100,initMood:50,initEnergy:55,initMoney:400,knifeDurability:3,scamMinLoss:500,scamMaxLoss:2000},
+  scenes:{morning:"上午 · 上课",afternoon:"下午 · 自习",evening:"傍晚 · 闲逛",night:"晚上 · 宿舍"},
+  newGame:{defaultName:"小明",created:"角色创建成功！",knifeInfo:"初始道具：刀盾（耐久 {0}）"},
+  events:{
+    apology:{
+      title:"课堂上的一幕",
+      desc:"你正在教室里上着无聊的公共课。\n\n突然，一个同学被老师点名提醒了几句。\n那同学猛地站起来，脸色通红——不是因为羞愧，而是因为愤怒。\n\n「你给我道歉！」同学吼道。\n老师愣了一下，说了句「不好意思」。\n\n但同学并不满意，拍着桌子大喊：\n「我最讨厌的就是事后道歉！杀杀杀！」\n\n全班鸦雀无声。你坐在角落里，手上的笔停住了。",
+      suffer:"默默承受（心情 -5）",shield:"举起刀盾，隔空防御（耐久 -1）",noKnife:"你被这抽象的场面震撼了...",
+      shieldUse:"你举起刀盾，对着空气格挡。虽然不知道在挡什么，但心情保住了！"
+    },
+    seatOccupy:{
+      title:"图书馆的奇葩占座",
+      desc:"你来到图书馆自习区，发现自己的老位置被占了。\n\n准确地说，是被\"占领\"了——\n桌上摆着一根香蕉、一个断线的充电宝、半瓶矿泉水和一张纸条，\n纸条上写着：「此座已占，不服来辩。——XX学院 王某」\n\n你环顾四周，发现其他空位也不多了。",
+      move:"默默换座（精力 -10）",clear:"使用刀盾清场！（精力 -5，心情 +5，耐久 -1）",
+      moveText:"你拎着书包换到了角落的位置，光线不太好，但至少安静。",
+      clearText:"你拔刀清场，香蕉和充电宝四处飞散。座位清空，爽！"
+    },
+    couple:{
+      title:"图书馆的情侣暴击",
+      desc:"你在图书馆找到了一个空位，刚坐下翻开书。\n\n对面坐下了一对情侣。\n他们开始小声说话——然后不小声了。\n桌上很快摆满了零食：薯片、奶茶、巧克力棒、切好的水果。\n男生在给女生讲题，但每讲一句就喂她一片薯片。\n\n你看了一眼自己的课本，又看了一眼对面的零食铺。\n你手里的笔在草稿纸上画了一个\"忍\"字。",
+      move:"默默换座（精力 -5）",ignore:"戴上耳机无视（心情 -3）",
+      moveText:"你收拾东西换到了走廊尽头的座位，那里只有风吹过。",
+      ignoreText:"你戴上耳机，把音量开到最大。看不见，听不见，就当不存在。"
+    },
+    duckLeg:{
+      title:"东门小吃街的鸭腿传说",
+      desc:"傍晚，你溜达到学校东门的小吃街。\n\n烤鸭腿的香味穿过整条街飘过来。\n一个同学端着饭盒从你身边走过，嘴里念叨着：\n「今天这鸭腿可以，皮脆肉嫩，十六块值了。」\n\n你摸了摸口袋。十六块钱。\n脑海里浮现出金黄色的鸭腿在烤架上滋滋冒油的画面。",
+      buy:"买一个吃！（-¥16，心情 +3）",pass:"算了，忍住",
+      noMoney:"钱不够！你只能眼巴巴地看着鸭腿摊...",
+      ateText:"鸭腿外皮酥脆，肉质鲜嫩。你站在街边啃完，手指上全是油。满足。",
+      passText:"你闻了闻空气中的鸭腿香，转身走开了。"
+    },
+    greenDuck:{
+      title:"绿色鸭腿事件",
+      desc:"今天你照常来到小吃街，照常买了鸭腿。\n\n但今天不一样——\n你咬下第一口后，发现鸭腿的肉是绿色的。\n\n那种绿，是不常见的暗绿，让你迟疑了一下。\n让你想起阅读题里代代相传的，死不瞑目的鱼眼里那道诡异的光。\n\n你愣住了。周围同学投来复杂的目光。\n你拍了照片。\n现在应该做什么——",
+      ask:"联系阿姨问问怎么回事",noAsk:"算了，不联系",
+      auntIntro:"阿姨擦了擦手，淡定地说：",
+      auntReply:"「秘制绿色健康蔬菜汁腌制，纯天然，放心吃。」",
+      ok:"\"好的好的\"",doubt:"\"我不信，这明明是坏的吧？\"",
+      noAskText:"你把绿色鸭腿扔进了垃圾桶。从此经过小吃街都会绕路走。",
+      acceptText:"你默默接受了这个解释。绿色就绿色吧，味道其实还不错。",
+      doubtText:"阿姨皱起眉头：「小同学，你看我这摊子多少年了，还能骗你？」\n你张了张嘴，看着阿姨坚定的眼神，还是把鸭腿吃完了。\n不过心里总觉得哪里不太对。",
+      done:"鸭腿事件永久结束！"
+    },
+    fox:{
+      title:"校门口的奇遇",
+      desc:"又是一个普通的傍晚。\n\n你走出校门，准备去小吃街觅食。\n忽然，一个穿着古装的人拦住了你的去路。\n\n那人面容清秀，长发束起，眼神深邃。\n他/她看着你，用一种不属于这个时代的语气问道：\n\n「同学，请问……你可曾在雪山救过一只狐狸？」\n\n校门口的保安大叔探出半个身子，表情非常困惑。",
+      yes:"\"救过。\"（心情 +10，称号「狐仙恩人」）",no:"\"没救过。\"",duck:"\"你是那只狐狸？\"",
+      yesResp:"那人微微一笑，向你鞠了一躬，转身消失在人群中。",
+      noResp:"那人失望地看了你一眼，转身离开了。",
+      duckIntro:"那人愣了一下，然后仰天大笑：",
+      duckLine:"「不，我是那只酱板鸭！」",
+      duckEnd:"说完转身就走，留下你和保安面面相觑。",
+      titleReward:"狐仙恩人"
+    },
+    chat:{
+      title:"网络聊天",
+      desc:"你打开手机，刷了刷社交平台。\n\n群里的消息还在飞速滚动——\n有人在讨论选修课哪个老师不点名，\n有人在分享食堂的新品踩雷日记，\n还有人发了张猫的照片问「有没有人认识这只猫」。\n\n你在群里回了几条消息，发了个表情包。\n虽然只是虚拟的文字，但有种奇妙的存在感。"
+    },
+    scam:{
+      title:"突如其来的链接",
+      desc:"你在群里正聊得开心，突然收到一条私信。\n\n「同学你好！校园贷新活动，日息低至0.01%，\n  还有刷单返现兼职，每天稳赚500+！」\n\n后面跟着一个链接。\n你本来想忽略的，但手指一滑——点开了。\n\n页面一闪。你的心跳漏了一拍。",
+      detail1:"页面上的数字跳动了几下，然后你的余额少了一大截。",
+      detail2:"你再点那个链接，已经打不开了。"
+    },
+    rooftop:{
+      title:"顶楼的微风",
+      desc:"你独自走上了教学楼的天台。\n\n门没有锁。也许从来就没锁过。\n\n风很大，吹过你的脸颊，带着远处小吃街隐约的烟火气。\n从这里能看见整个校园——\n图书馆灯火通明，操场上有人夜跑，\n宿舍楼的窗户里透出各种颜色的光。\n\n一切都在照常运转。\n你趴在栏杆上，深深的吸了一口气。\n\n好像……也没那么糟。",
+      after:"你在天台上站了很久。风慢慢吹干了眼角的湿意。\n等你转身下楼时，天已经黑透了。今天就这样过去吧。"
+    }
+  },
+  phases:{
+    morningClass:"你走进教室，找了个靠窗的位置坐下。",
+    morningPeace:[
+      "老师在前面讲课，你在笔记本上画了一只鸭子。\n一上午就这样过去了。",
+      "老师在前面讲课，你在笔记本上画了一只鹅。\n一上午就这样过去了。",
+      "老师在前面讲课，你在笔记本上画了一只奶龙。\n一上午就这样过去了。",
+      "老师在前面讲课，你在笔记本上画了一只虎鲸。\n一上午就这样过去了。",
+      "老师在前面讲课，你在笔记本上画了一只海豚。\n一上午就这样过去了。",
+      "老师在前面讲课，你在笔记本上画了一只企鹅。\n老师瞪了你一眼——大概是因为你画的不是课程内容。",
+      "老师在前面讲课，你在笔记本上画了一只水母。\n旁边同学看了一眼，默默在边上加了注释：「海洋生物图鉴 p.7」。",
+      "老师在前面讲课，你在笔记本上画了一只猫。\n下课的时候你才发现自己画了一整页。"
+    ],
+    morningAttentive:[
+      "你认真听完了整节课，笔记记得密密麻麻。\n虽然有点累，但感觉学到了不少东西。",
+      "今天讲的知识点你全都跟上了，还在课本上画了重点。\n下课铃响的时候你甚至有点意犹未尽。",
+      "你全神贯注地听了一上午，连旁边同学递零食都没注意到。\n老师看了你一眼，满意地点了点头。",
+      "你一边听讲一边整理笔记，思路非常清晰。\n这节课的内容，你觉得自己能考满分。",
+      "老师讲到一个有趣的案例，你忍不住多记了几笔。\n一上午充实得像是只过了半小时。",
+      "你把老师说的每个重点都标记了出来，还补充了自己的思考。\n旁边的同学偷偷瞄了一眼你的笔记，露出了惭愧的表情。",
+      "今天的内容正好是你感兴趣的领域，你听得格外认真。\n下课的时候你还在回味刚才的思路。",
+      "你一上午都没走神，连手机都没碰过。\n这在你的大学生涯里算是相当罕见的成就了。"
+    ],
+    morningTrigger:"老师正在讲课……突然，教室里安静了。",
+    afternoon:"你来到图书馆，找了个位置开始自习。",
+    afternoonPeace:"你安静地看了会儿书，效率一般。",
+    evening:"你走出图书馆，傍晚的风吹得很舒服。",
+    eveningWalk:"你在校园里随便走了走。夕阳很美。",
+    nightIntro:"晚上的宿舍，窗外隐约传来操场上的说笑声。",
+    nightRest:"你躺在床上，闭上眼睛。",
+    nightRestDetail:"耳边隐约传来室友打游戏的声音，但你太累了，很快就睡着了。",
+    nightIdle:"你在宿舍里发了一会儿呆，什么也没做。"
+  },
+  endings:{
+    fragile:{title:"脆皮大学生",text:["你倒下了。","过度劳累。熬夜。奔波。承受了太多抽象的场面。","倒下的那一刻你想：「明天一定早睡。」","但明天来的时候，你已经躺在医务室了。"]},
+    bankrupt:{title:"财务管理大师",text:["你的钱包空了。","也许是被骗的，也许是吃鸭腿吃光的，也许两者都有。","你坐在宿舍床上，翻出口袋里的钢镚。","「下次一定理性消费。」然后你去食堂蹭了顿免费汤。"]},
+    master:{title:"时间管理大师",text:["所有抽象体验，你一样不落。","鸭腿的绿色、占座的香蕉、图书馆的零食铺、","校门口的酱板鸭、聊天框里的诈骗链接……","身心俱疲。但圆满收官。","你坐在天台上，风吹过脸庞。你笑了笑。","「这就是大学生活。还能更抽象一点吗？」"]}
+  }
+};
+
+// ══════════════════════════════════════════
+//  UTILITY
+// ══════════════════════════════════════════
+function rnd(min,max){return min+Math.floor(Math.random()*(max-min+1));}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function clamp(v,lo,hi){return v<lo?lo:v>hi?hi:v;}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='s-load') renderLoadSlots();
+  if(id==='s-save') renderSaveSlots();
+}
+
+// ══════════════════════════════════════════
+//  PLAYER STATE
+// ══════════════════════════════════════════
+const S = STORY.settings;
+let P = null;
+
+function newPlayer(name){
+  return {
+    name, mood:S.initMood, energy:S.initEnergy, money:S.initMoney, knowledge:0,
+    ksDur:S.knifeDurability,
+    dl:0,st:0,out:0,chat:0,
+    dlDone:false,gdDone:false,soDone:false,cpDone:false,
+    fxDone:false,scDone:false,rfDone:false,apDone:false,
+    title:'',ksShown:false
+  };
+}
+function hasKS(){return P&&P.ksDur>0;}
+function useKS(){if(hasKS()) P.ksDur--;}
+
+// ══════════════════════════════════════════
+//  SAVE / LOAD  (localStorage)
+// ══════════════════════════════════════════
+function saveToSlot(slot){
+  const data={player:JSON.parse(JSON.stringify(P)),day:G.day,phase:G.phase,time:new Date().toLocaleString('zh-CN')};
+  localStorage.setItem('campus_save_'+slot, JSON.stringify(data));
+}
+function loadFromSlot(slot){
+  const raw=localStorage.getItem('campus_save_'+slot);
+  if(!raw) return null;
+  try{return JSON.parse(raw);}catch{return null;}
+}
+function delSlot(slot){localStorage.removeItem('campus_save_'+slot);}
+
+function renderLoadSlots(){
+  const el=document.getElementById('save-slots-load');
+  let html='';
+  for(let i=1;i<=3;i++){
+    const d=loadFromSlot(i);
+    if(d){
+      html+=`<div class="save-slot">
+        <div class="save-info">
+          <div class="save-name">槽位 ${i} — ${d.player.name}</div>
+          <div class="save-meta">${d.time||'未知'} · 第${d.day}天 · 心情${d.player.mood} 精力${d.player.energy} ¥${d.player.money}</div>
+        </div>
+        <div class="save-actions">
+          <button class="btn-sm" onclick="G.loadSlot(${i})">读取</button>
+          <button class="btn-sm danger" onclick="delSlot(${i});renderLoadSlots()">删除</button>
+        </div>
+      </div>`;
+    } else {
+      html+=`<div class="save-slot"><div class="save-info t-gray">槽位 ${i} — （空）</div></div>`;
+    }
+  }
+  el.innerHTML=html||'<div class="mini-hint">暂无存档</div>';
+}
+function renderSaveSlots(){
+  const el=document.getElementById('save-slots-save');
+  let html='';
+  for(let i=1;i<=3;i++){
+    const d=loadFromSlot(i);
+    if(d){
+      html+=`<div class="save-slot">
+        <div class="save-info">
+          <div class="save-name">槽位 ${i} — ${d.player.name}</div>
+          <div class="save-meta">${d.time||'未知'} · 第${d.day}天</div>
+        </div>
+        <div class="save-actions"><button class="btn-sm" onclick="G.saveSlot(${i})">覆盖</button></div>
+      </div>`;
+    } else {
+      html+=`<div class="save-slot">
+        <div class="save-info t-gray">槽位 ${i} — （空）</div>
+        <div class="save-actions"><button class="btn-sm" onclick="G.saveSlot(${i})">保存</button></div>
+      </div>`;
+    }
+  }
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════
+function updateHUD(){
+  if(!P) return;
+  document.getElementById('day-phase-label').textContent=`第${G.day}天 · ${STORY.scenes[G.phase]||G.phase}`;
+  document.getElementById('s-mood').textContent=P.mood;
+  document.getElementById('s-nrg').textContent=P.energy;
+  document.getElementById('s-money').textContent='¥'+P.money;
+  document.getElementById('s-kn').textContent=P.knowledge;
+  document.getElementById('b-mood').style.width=(P.mood/S.maxStat*100)+'%';
+  document.getElementById('b-nrg').style.width=(P.energy/S.maxStat*100)+'%';
+  const ksb=document.getElementById('ks-badge');
+  if(hasKS()){ksb.style.display='';document.getElementById('ks-dur').textContent=P.ksDur;}
+  else ksb.style.display='none';
+}
+
+function gameContent(){return document.getElementById('game-content');}
+
+function renderCard({title,titleColor,desc,choices,log,after}){
+  let html=`<div class="story-card">`;
+  if(title) html+=`<div class="story-title ${titleColor||''}">${title}</div>`;
+  if(desc) html+=`<div class="story-desc">${escHtml(desc)}</div>`;
+  if(log&&log.length){
+    html+=`<hr class="story-sep"><div class="result-log">`;
+    log.forEach(l=>{html+=`<div class="log-line"><span class="${l.cls||''}">${escHtml(l.text)}</span></div>`;});
+    html+=`</div>`;
+  }
+  if(after) html+=`<div class="story-desc" style="margin-top:10px;font-size:13px;color:var(--text3);">${escHtml(after)}</div>`;
+  if(choices&&choices.length){
+    html+=`<hr class="story-sep"><div class="choices">`;
+    choices.forEach((c,i)=>{
+      if(c.hidden) return;
+      html+=`<button class="choice-btn ${c.cls||''}" onclick="G.choose(${i})" ${c.disabled?'disabled':''}>${escHtml(c.label)}</button>`;
+    });
+    html+=`</div>`;
+  }
+  html+=`</div>`;
+  gameContent().innerHTML=html;
+  updateHUD();
+}
+
+function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function statLog(label,delta,current,cls){
+  const sign=delta>=0?'+':'';
+  return {text:`${label} ${sign}${delta}（当前: ${current}）`, cls};
+}
+
+// ══════════════════════════════════════════
+//  STATUS SCREEN
+// ══════════════════════════════════════════
+function renderStatus(){
+  const events=[
+    {key:'apDone',label:'道歉事件'},{key:'soDone',label:'占座事件'},
+    {key:'cpDone',label:'情侣事件'},{key:'gdDone',label:'绿色鸭腿'},
+    {key:'fxDone',label:'狐狸奇遇'},{key:'scDone',label:'网络诈骗'}
+  ];
+  let evHtml=events.map(e=>`<div class="event-chip ${P[e.key]?'done':'undone'}">${P[e.key]?'✓ ':''}${e.label}</div>`).join('');
+  let titleHtml=P.title?`<div class="title-badge">称号: ${escHtml(P.title)}</div>`:'';
+  let ksText=hasKS()?`刀盾 [耐久 ${P.ksDur}]`:'(已损毁)';
+  document.getElementById('status-content').innerHTML=`
+    <div class="story-card" style="margin-bottom:12px;">
+      <div class="story-title">${escHtml(P.name)} 的状态</div>
+      ${titleHtml}
+      <div style="margin-top:14px;color:var(--text3);font-size:13px;">道具: <span style="color:var(--purple)">${escHtml(ksText)}</span> &nbsp;|&nbsp; 鸭腿×${P.dl} 自习×${P.st} 外出×${P.out} 聊天×${P.chat}</div>
+    </div>
+    <div class="status-grid">
+      <div class="status-cell">
+        <div class="status-cell-label">心情</div>
+        <div class="status-cell-val t-green">${P.mood}</div>
+        <div class="bar-wrap"><div class="bar-fill" style="background:var(--green);width:${P.mood}%"></div></div>
+      </div>
+      <div class="status-cell">
+        <div class="status-cell-label">精力</div>
+        <div class="status-cell-val t-yellow">${P.energy}</div>
+        <div class="bar-wrap"><div class="bar-fill" style="background:var(--yellow);width:${P.energy}%"></div></div>
+      </div>
+      <div class="status-cell">
+        <div class="status-cell-label">金钱</div>
+        <div class="status-cell-val t-cyan">¥${P.money}</div>
+      </div>
+      <div class="status-cell">
+        <div class="status-cell-label">学识</div>
+        <div class="status-cell-val t-purple">${P.knowledge}</div>
+      </div>
+    </div>
+    <div class="events-grid">${evHtml}</div>
+  `;
+}
+
+// ══════════════════════════════════════════
+//  GAME ENGINE
+// ══════════════════════════════════════════
+const G = {
+  day:1,phase:'morning',
+  _nextAction:null,
+  _pendingLog:[],
+  _stageState:{},
+
+  newGame(){
+    P = newPlayer(STORY.newGame.defaultName);
+    G.day=1; G.phase='morning';
+    G._pendingLog=[]; G._stageState={};
+    showScreen('s-intro');
+    G.playIntro();
+  },
+
+  loadSlot(slot){
+    const d=loadFromSlot(slot);
+    if(!d){alert('存档读取失败');return;}
+    P=d.player;
+    G.day=d.day; G.phase=d.phase||'morning';
+    G._pendingLog=[]; G._stageState={};
+    showScreen('s-game');
+    updateHUD();
+    G.runPhase();
+  },
+
+  saveSlot(slot){
+    saveToSlot(slot);
+    alert('存档成功！槽位 '+slot);
+    showScreen('s-game');
+    G.runPhase();
+  },
+
+  openStatus(){
+    renderStatus();
+    showScreen('s-status');
+  },
+
+  openSave(){
+    showScreen('s-save');
+  },
+
+  resumeGame(){
+    showScreen('s-game');
+    updateHUD();
+    G.runPhase();
+  },
+
+  playIntro(){
+    const lines=STORY.meta.intro;
+    const cont=document.getElementById('intro-lines');
+    cont.innerHTML='';
+    lines.forEach((l,i)=>{
+      setTimeout(()=>{
+        const d=document.createElement('div');
+        d.className='intro-line';
+        d.style.animationDelay='0s';
+        d.textContent=l;
+        cont.appendChild(d);
+        if(i===lines.length-1){
+          setTimeout(()=>{
+            const kit=document.getElementById('intro-kit');
+            const ki=STORY.newGame.knifeInfo.replace('{0}',S.knifeDurability);
+            kit.innerHTML=`<div class="log-line"><span class="t-green">${escHtml(STORY.newGame.created)}</span></div><div class="log-line"><span class="t-purple">${escHtml(ki)}</span></div>`;
+            document.getElementById('intro-next-btn').style.display='';
+          },600);
+        }
+      },i*700);
+    });
+  },
+
+  startLoop(){
+    showScreen('s-game');
+    updateHUD();
+    G.runPhase();
+  },
+
+  runPhase(){
+    // Check mood ≤ 0 before phase
+    if(P.mood<=0 && !P.rfDone){
+      G.triggerRooftop(); return;
+    }
+    if(G.checkEnd()) return;
+    if(G.phase==='morning') G.phaseMorning();
+    else if(G.phase==='afternoon') G.phaseAfternoon();
+    else if(G.phase==='evening') G.phaseEvening();
+    else if(G.phase==='night') G.phaseNight();
+  },
+
+  nextPhase(){
+    const order=['morning','afternoon','evening','night'];
+    const idx=order.indexOf(G.phase);
+    if(idx===order.length-1){G.phase='morning';G.day++;}
+    else G.phase=order[idx+1];
+  },
+
+  advanceAndRun(){
+    // check end after phase action
+    if(P.mood<=0 && !P.rfDone){G.triggerRooftop();return;}
+    if(G.checkEnd()) return;
+    G.nextPhase();
+    G.runPhase();
+  },
+
+  // ── MORNING ──
+  phaseMorning(){
+    renderCard({
+      title: STORY.scenes.morning,
+      titleColor:'cyan',
+      desc: STORY.phases.morningClass,
+      choices:[
+        {label:'认真听课（学识 +1）', cls:'highlight'},
+        {label:'走神发呆'}
+      ]
+    });
+    G._nextAction=(ch)=>{
+      const attentive=(ch===0);
+      let log=[];
+      if(attentive){P.knowledge++;log.push({text:`学识 +1（当前: ${P.knowledge}）`,cls:'t-purple'});}
+      else log.push({text:'你走神了，什么也没学到。',cls:'t-gray'});
+
+      // Maybe trigger apology event
+      if(!P.apDone && Math.random()<0.3){
+        // show apology trigger
+        G._pendingLog=log;
+        G._stageState={attentive};
+        renderCard({
+          title:'课堂上的一幕',
+          titleColor:'yellow',
+          desc:STORY.phases.morningTrigger+'\n\n'+STORY.events.apology.desc,
+          log,
+          choices: hasKS()
+            ? [{label:STORY.events.apology.suffer},{label:STORY.events.apology.shield,cls:'highlight'}]
+            : [{label:'（刀盾已损毁）默默承受（心情 -5）'}]
+        });
+        updateHUD();
+        G._nextAction=(ch2)=>{
+          let log2=[];
+          if(hasKS()&&ch2===1){
+            useKS(); P.apDone=true;
+            log2.push({text:STORY.events.apology.shieldUse,cls:'t-green'});
+            log2.push({text:`刀盾耐久 -1（剩余: ${P.ksDur}）`,cls:'t-yellow'});
+            if(!hasKS()&&!P.ksShown){P.ksShown=true;log2.push({text:STORY.meta.knifeShattered,cls:'t-purple'});}
+          } else {
+            P.apDone=true; P.mood=clamp(P.mood-5,0,S.maxStat);
+            log2.push(statLog('心情',-5,P.mood,'t-red'));
+            if(!hasKS()&&!P.ksShown){P.ksShown=true;log2.push({text:STORY.meta.knifeShattered,cls:'t-purple'});}
+          }
+          G.showResult({log:log2,after:'下课铃响了。',onContinue:()=>G.advanceAndRun()});
+        };
+        return;
+      }
+      // No event
+      const arr=attentive?STORY.phases.morningAttentive:STORY.phases.morningPeace;
+      G.showResult({log,after:pick(arr),onContinue:()=>G.advanceAndRun()});
+    };
+  },
+
+  // ── AFTERNOON ──
+  phaseAfternoon(){
+    renderCard({
+      title: STORY.scenes.afternoon,
+      titleColor:'cyan',
+      desc:'今天下午，你要做什么？',
+      choices:[
+        {label:'去图书馆自习'},
+        {label:'兼职打工（¥+100，跳过傍晚）',cls:'highlight'}
+      ]
+    });
+    G._nextAction=(ch)=>{
+      if(ch===1){
+        P.money+=100;
+        G.showResult({
+          log:[{text:'你找到了一份临时兼职，忙碌了一整个下午。',cls:'t-gray'},{text:`金钱 +100（当前: ¥${P.money}）`,cls:'t-cyan'}],
+          after:'忙碌之后，天色已晚，直接跳过了傍晚时光。',
+          onContinue:()=>{
+            // skip evening, go to night
+            G.phase='night'; G.runPhase();
+          }
+        }); return;
+      }
+      // Library
+      P.st++;
+      let log=[{text:STORY.phases.afternoon,cls:'t-gray'}];
+      if(P.st>=3){
+        P.st=0;
+        // Random event: seatOccupy or couple
+        if(Math.random()<0.5) G.triggerSeatOccupy();
+        else G.triggerCouple();
+      } else {
+        log.push({text:`已自习 ${P.st} 次，再自修 ${3-P.st} 次可能触发事件`,cls:'t-gray'});
+        G.showResult({log,after:STORY.phases.afternoonPeace,onContinue:()=>G.advanceAndRun()});
+      }
+    };
+  },
+
+  triggerSeatOccupy(){
+    P.soDone=true;
+    const ev=STORY.events.seatOccupy;
+    renderCard({title:ev.title,titleColor:'yellow',desc:ev.desc,choices:
+      hasKS()?[{label:ev.move},{label:ev.clear,cls:'highlight'}]:[{label:ev.move}]});
+    G._nextAction=(ch)=>{
+      let log=[];
+      if(hasKS()&&ch===1){
+        useKS(); P.energy=clamp(P.energy-5,0,S.maxStat); P.mood=clamp(P.mood+5,0,S.maxStat);
+        log.push(statLog('精力',-5,P.energy,'t-red'));
+        log.push(statLog('心情',+5,P.mood,'t-green'));
+        log.push({text:`刀盾耐久 -1（剩余: ${P.ksDur}）`,cls:'t-yellow'});
+        log.push({text:ev.clearText,cls:'t-green'});
+      } else {
+        P.energy=clamp(P.energy-10,0,S.maxStat);
+        log.push(statLog('精力',-10,P.energy,'t-red'));
+        log.push({text:ev.moveText,cls:'t-gray'});
+      }
+      if(!hasKS()&&!P.ksShown){P.ksShown=true;log.push({text:STORY.meta.knifeShattered,cls:'t-purple'});}
+      G.showResult({log,onContinue:()=>G.advanceAndRun()});
+    };
+  },
+
+  triggerCouple(){
+    P.cpDone=true;
+    const ev=STORY.events.couple;
+    renderCard({title:ev.title,titleColor:'yellow',desc:ev.desc,choices:[{label:ev.move},{label:ev.ignore}]});
+    G._nextAction=(ch)=>{
+      let log=[];
+      if(ch===0){P.energy=clamp(P.energy-5,0,S.maxStat);log.push(statLog('精力',-5,P.energy,'t-red'));log.push({text:ev.moveText,cls:'t-gray'});}
+      else{P.mood=clamp(P.mood-3,0,S.maxStat);log.push(statLog('心情',-3,P.mood,'t-red'));log.push({text:ev.ignoreText,cls:'t-gray'});}
+      G.showResult({log,onContinue:()=>G.advanceAndRun()});
+    };
+  },
+
+  // ── EVENING ──
+  phaseEvening(){
+    P.out++;
+    const ev=STORY.events;
+    // Day 3+ fox event
+    if(G.day>=3&&!P.fxDone){G.triggerFox();return;}
+    // Duck leg events
+    if(!P.dlDone&&Math.random()<0.4){
+      if(P.dl>=3){G.triggerGreenDuck();}
+      else{G.triggerDuckLeg();}
+      return;
+    }
+    // Ordinary walk
+    G.showResult({
+      log:[{text:STORY.phases.evening,cls:'t-gray'},{text:STORY.phases.eveningWalk,cls:'t-gray'}],
+      onContinue:()=>G.advanceAndRun()
+    });
+  },
+
+  triggerDuckLeg(){
+    const ev=STORY.events.duckLeg;
+    renderCard({title:ev.title,titleColor:'yellow',desc:ev.desc,choices:[{label:ev.buy,cls:'highlight'},{label:ev.pass}]});
+    G._nextAction=(ch)=>{
+      let log=[];
+      if(ch===0){
+        if(P.money<16){P.mood=clamp(P.mood-2,0,S.maxStat);log.push({text:ev.noMoney,cls:'t-red'});log.push(statLog('心情',-2,P.mood,'t-red'));}
+        else{P.money-=16;P.dl++;P.mood=clamp(P.mood+3,0,S.maxStat);
+          log.push(statLog('心情',+3,P.mood,'t-green'));
+          log.push({text:`金钱 -16（剩余: ¥${P.money}）`,cls:'t-cyan'});
+          log.push({text:`已吃鸭腿: ${P.dl}`,cls:'t-yellow'});
+          log.push({text:ev.ateText,cls:'t-gray'});}
+      } else {log.push({text:ev.passText,cls:'t-gray'});}
+      G.showResult({log,onContinue:()=>G.advanceAndRun()});
+    };
+  },
+
+  triggerGreenDuck(){
+    const ev=STORY.events.greenDuck;
+    renderCard({title:ev.title,titleColor:'green',desc:ev.desc,choices:[{label:ev.ask,cls:'highlight'},{label:ev.noAsk}]});
+    G._nextAction=(ch)=>{
+      if(ch===1){
+        P.mood=clamp(P.mood-5,0,S.maxStat);P.dlDone=true;
+        G.showResult({log:[statLog('心情',-5,P.mood,'t-red'),{text:ev.noAskText,cls:'t-gray'},{text:ev.done,cls:'t-purple'}],onContinue:()=>G.advanceAndRun()});
+        return;
+      }
+      // Contact aunt — show sub-choices
+      renderCard({title:ev.title,titleColor:'green',
+        desc:ev.desc+'\n\n'+ev.auntIntro+'\n'+ev.auntReply,
+        choices:[{label:ev.ok,cls:'highlight'},{label:ev.doubt}]});
+      G._nextAction=(ch2)=>{
+        let log=[];
+        if(ch2===1){P.mood=clamp(P.mood-3,0,S.maxStat);P.gdDone=true;P.dlDone=true;
+          log.push(statLog('心情',-3,P.mood,'t-red'));log.push({text:ev.doubtText,cls:'t-gray'});}
+        else{P.mood=clamp(P.mood+5,0,S.maxStat);P.gdDone=true;P.dlDone=true;
+          log.push(statLog('心情',+5,P.mood,'t-green'));log.push({text:ev.acceptText,cls:'t-gray'});}
+        log.push({text:ev.done,cls:'t-purple'});
+        G.showResult({log,onContinue:()=>G.advanceAndRun()});
+      };
+    };
+  },
+
+  triggerFox(){
+    P.fxDone=true;
+    const ev=STORY.events.fox;
+    renderCard({title:ev.title,titleColor:'purple',desc:ev.desc,choices:[{label:ev.yes,cls:'highlight'},{label:ev.no},{label:ev.duck}]});
+    G._nextAction=(ch)=>{
+      let log=[];
+      if(ch===0){P.mood=clamp(P.mood+10,0,S.maxStat);P.title=ev.titleReward;
+        log.push(statLog('心情',+10,P.mood,'t-green'));
+        log.push({text:`获得称号: ${ev.titleReward}`,cls:'t-purple'});
+        log.push({text:ev.yesResp,cls:'t-gray'});}
+      else if(ch===2){P.mood=clamp(P.mood+5,0,S.maxStat);
+        log.push(statLog('心情',+5,P.mood,'t-green'));
+        log.push({text:ev.duckIntro,cls:'t-gray'});
+        log.push({text:ev.duckLine,cls:'t-yellow'});
+        log.push({text:ev.duckEnd,cls:'t-gray'});}
+      else{log.push({text:ev.noResp,cls:'t-gray'});}
+      G.showResult({log,onContinue:()=>G.advanceAndRun()});
+    };
+  },
+
+  // ── ROOFTOP ──
+  triggerRooftop(){
+    P.rfDone=true; P.mood=clamp(15,0,S.maxStat); P.energy=clamp(P.energy+5,0,S.maxStat);
+    const ev=STORY.events.rooftop;
+    renderCard({title:ev.title,titleColor:'cyan',desc:ev.desc,log:[
+      {text:`心情恢复至 15（当前: ${P.mood}）`,cls:'t-green'},
+      {text:`精力 +5（当前: ${P.energy}）`,cls:'t-green'}
+    ],choices:[{label:'继续'}]});
+    G._nextAction=()=>{
+      G.showResult({after:ev.after,onContinue:()=>{
+        G.phase='night'; G.runPhase();
+      }});
+    };
+  },
+
+  // ── NIGHT ──
+  phaseNight(){
+    renderCard({
+      title:STORY.scenes.night,
+      titleColor:'cyan',
+      desc:STORY.phases.nightIntro,
+      choices:[
+        {label:'网络聊天（心情 +2）'},
+        {label:'休息恢复（精力 +20）',cls:'highlight'},
+        {label:'熬夜学习（学识 +2，精力 -20，心情 -10）'},
+        {label:'查看状态'}
+      ]
+    });
+    G._nextAction=(ch)=>{
+      if(ch===3){G.openStatus();return;}
+      if(ch===0){
+        // Chat — might trigger scam
+        if(P.chat>=5&&!P.scDone){G.triggerScam();}
+        else{P.chat++;P.mood=clamp(P.mood+2,0,S.maxStat);
+          renderCard({title:STORY.events.chat.title,titleColor:'cyan',desc:STORY.events.chat.desc,
+            log:[statLog('心情',+2,P.mood,'t-green'),{text:`已聊天: ${P.chat}`,cls:'t-gray'}],
+            choices:[{label:'继续'}]});
+          G._nextAction=()=>G.advanceAndRun();}
+      } else if(ch===1){
+        P.energy=clamp(P.energy+20,0,S.maxStat);
+        G.showResult({log:[{text:STORY.phases.nightRest,cls:'t-gray'},statLog('精力',+20,P.energy,'t-green'),{text:STORY.phases.nightRestDetail,cls:'t-gray'}],onContinue:()=>G.advanceAndRun()});
+      } else if(ch===2){
+        P.knowledge+=2;P.energy=clamp(P.energy-20,0,S.maxStat);P.mood=clamp(P.mood-10,0,S.maxStat);
+        G.showResult({
+          log:[
+            {text:'你打开台灯，翻开课本，开始了深夜苦读。',cls:'t-gray'},
+            statLog('学识',+2,P.knowledge,'t-purple'),
+            statLog('精力',-20,P.energy,'t-red'),
+            statLog('心情',-10,P.mood,'t-red')
+          ],onContinue:()=>G.advanceAndRun()});
+      }
+    };
+  },
+
+  triggerScam(){
+    P.scDone=true;
+    const ev=STORY.events.scam;
+    const loss=rnd(S.scamMinLoss,S.scamMaxLoss);
+    const before=P.money; P.money=Math.max(0,P.money-loss); const actual=before-P.money;
+    P.mood=clamp(P.mood-10,0,S.maxStat);
+    renderCard({title:ev.title,titleColor:'red',desc:ev.desc,
+      log:[
+        {text:`金钱 -${actual}${P.money===0?'（已归零）':''}（剩余: ¥${P.money}）`,cls:'t-red'},
+        {text:ev.detail1,cls:'t-gray'},{text:ev.detail2,cls:'t-gray'},
+        statLog('心情',-10,P.mood,'t-red')
+      ],choices:[{label:'继续'}]});
+    G._nextAction=()=>G.advanceAndRun();
+  },
+
+  // ── CHOICE HANDLER ──
+  choose(idx){
+    if(G._nextAction) G._nextAction(idx);
+  },
+
+  // ── RESULT CARD ──
+  showResult({log,after,onContinue}){
+    renderCard({
+      log:log||[],
+      after,
+      choices:[{label:'继续 →',cls:'highlight'}]
+    });
+    G._nextAction=()=>{if(onContinue)onContinue();};
+  },
+
+  // ── END CHECK ──
+  checkEnd(){
+    if(P.energy<=0){G.triggerEnding('fragile');return true;}
+    if(P.money<=0){G.triggerEnding('bankrupt');return true;}
+    // Master: low mood & energy, all main events done
+    if(P.mood<=5&&P.energy<=5&&P.gdDone&&P.soDone&&P.cpDone&&P.fxDone&&P.scDone){G.triggerEnding('master');return true;}
+    return false;
+  },
+
+  triggerEnding(type){
+    const ed=STORY.endings[type];
+    const colorMap={fragile:'t-red',bankrupt:'t-red',master:'t-green'};
+    let textHtml=ed.text.map(t=>`<p>${escHtml(t)}</p>`).join('');
+    let statsHtml=`<div class="ending-stats">存活天数 <span>${G.day} 天</span>`;
+    if(P.title) statsHtml+=` &nbsp;|&nbsp; 称号 <span>${escHtml(P.title)}</span>`;
+    statsHtml+='</div>';
+    document.getElementById('ending-box').innerHTML=`
+      <div class="ending-title ${colorMap[type]}">「${escHtml(ed.title)}」</div>
+      <div class="ending-sub">GAME OVER</div>
+      ${statsHtml}
+      <div class="ending-text">${textHtml}</div>
+      <button class="btn accent" onclick="showScreen('s-menu')">返回主菜单</button>
+    `;
+    showScreen('s-ending');
+  }
+};
+
+// Bootstrap
+updateHUD && updateHUD();
+</script>
+</body>
+</html>
