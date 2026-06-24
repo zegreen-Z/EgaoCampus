@@ -62,6 +62,7 @@
   .header-right{display:flex;gap:8px;align-items:center;}
   .ks-badge{background:var(--purple-dim);border:1px solid var(--purple);color:var(--purple);border-radius:4px;padding:2px 8px;font-size:12px;}
   .ks-badge.gold{border-color:var(--yellow);color:var(--yellow);background:var(--yellow-dim);}
+  .ks-badge.red{border-color:var(--red);color:var(--red);background:var(--red-dim);}
 
   /* ── STORY CARD ── */
   .story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:12px;}
@@ -264,6 +265,7 @@
     <div class="header-right">
       <span class="ks-badge" id="ks-badge" style="display:none;">刀盾 <span id="ks-dur">3</span></span>
       <span class="ks-badge gold" id="sc-badge" style="display:none;">奖学金</span>
+      <span class="ks-badge" id="qz-badge" style="display:none;font-size:11px;">测<span id="qz-text"></span></span>
       <button class="btn-sm" onclick="G.openStatus()">状态</button>
       <button class="btn-sm" onclick="G.openSave()">存档</button>
     </div>
@@ -611,6 +613,15 @@ function updateHUD(){
   else ksb.style.display='none';
   if(hasScholarship()){scb.style.display='';}
   else scb.style.display='none';
+  // 随堂测试徽章
+  const qzb=document.getElementById('qz-badge'), qzt=document.getElementById('qz-text');
+  if(P.q30Done || P.q60Done){
+    qzb.style.display='';
+    const s1=P.q30Done?(P.q30Pass?'1✓':'1✗'):'1?';
+    const s2=P.q60Done?(P.q60Pass?'2✓':'2✗'):'2?';
+    qzt.textContent=s1+' '+s2;
+    qzb.className='ks-badge '+(P.q30Pass&&P.q60Pass?'gold':(P.q30Pass||P.q60Pass?'':'red'));
+  } else { qzb.style.display='none'; }
 }
 
 function gameContent(){return document.getElementById('game-content');}
@@ -657,15 +668,16 @@ function renderStatus(){
   let evHtml=events.map(e=>`<div class="event-chip ${P[e.key]?'done':'undone'}">${P[e.key]?'✓ ':''}${e.label}</div>`).join('');
   let titleHtml=P.title?`<div class="title-badge">称号: ${escHtml(P.title)}</div>`:'';
 
-  // Quiz status
-  let q30Label='未触发', q30Cls='pending';
-  if(P.q30Done){q30Label=P.q30Pass?'测试1 通过':'测试1 未过'; q30Cls=P.q30Pass?'pass':'fail';}
-  let q60Label='未触发', q60Cls='pending';
-  if(P.q60Done){q60Label=P.q60Pass?'测试2 通过':'测试2 未过'; q60Cls=P.q60Pass?'pass':'fail';}
-  let quizHtml=`<div class="quiz-grid">
-    <div class="quiz-chip ${q30Cls}">${q30Label}</div>
-    <div class="quiz-chip ${q60Cls}">${q60Label}</div>
-  </div>`;
+  // 随堂测试状态
+  let q30Label='第30天: 未触发', q30Cls='pending';
+  if(P.q30Done){q30Label=P.q30Pass?'第30天: 通过 ✓':'第30天: 未通过 ✗'; q30Cls=P.q30Pass?'pass':'fail';}
+  let q60Label='第60天: 未触发', q60Cls='pending';
+  if(P.q60Done){q60Label=P.q60Pass?'第60天: 通过 ✓':'第60天: 未通过 ✗'; q60Cls=P.q60Pass?'pass':'fail';}
+  let quizHtml=`<div class="section-label" style="font-size:13px;color:var(--text2);margin-bottom:8px;">随堂测试</div>
+    <div class="quiz-grid">
+      <div class="quiz-chip ${q30Cls}">${q30Label}</div>
+      <div class="quiz-chip ${q60Cls}">${q60Label}</div>
+    </div>`;
 
   // Items list
   let itemsText = P.items.map(i=>{
