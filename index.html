@@ -174,7 +174,7 @@
       <button class="btn green" onclick="G.newGame()">开始新游戏</button>
       <button class="btn yellow" onclick="showScreen('s-load')">读取存档</button>
       <button class="btn cyan" onclick="showScreen('s-help')">游戏说明</button>
-      <button class="btn red" onclick="if(confirm('确定退出？'))window.close()">退出游戏</button>
+      <button class="btn red" onclick="showScreen('s-goodbye')">退出游戏</button>
     </div>
     <div class="menu-version">v5.0 Web Edition · 基于 story.json</div>
   </div>
@@ -188,7 +188,7 @@
       <h3>日程安排</h3>
       <div class="help-row"><span class="help-key">上午</span><span>上课（认真听课可增加学识，走神则无收获）</span></div>
       <div class="help-row"><span class="help-key">下午</span><span>自习（累计3次随机触发图书馆事件）/ 兼职打工</span></div>
-      <div class="help-row"><span class="help-key">傍晚</span><span>闲逛（买鸭腿 / 偶遇奇人）</span></div>
+      <div class="help-row"><span class="help-key">傍晚</span><span>闲逛（买鹅腿 / 偶遇奇人）</span></div>
       <div class="help-row"><span class="help-key">晚上</span><span>宿舍（聊天、休息、或熬夜学习）</span></div>
     </div>
     <div class="help-section">
@@ -300,6 +300,17 @@
   <div class="ending-box" id="ending-box"></div>
 </div>
 
+<!-- ════════════ SCREEN: GOODBYE ════════════ -->
+<div id="s-goodbye" class="screen">
+  <div class="menu-box">
+    <div class="game-title" style="font-size:22px;">再见！</div>
+    <div class="game-sub" style="margin-bottom:20px;">感谢游玩校园抽象模拟器</div>
+    <div class="menu-btns">
+      <button class="btn accent" onclick="showScreen('s-menu')">返回主菜单</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- #app -->
 
 <script>
@@ -343,24 +354,24 @@ const STORY = {
       ignoreText:"你戴上耳机，把音量开到最大。看不见，听不见，就当不存在。"
     },
     duckLeg:{
-      title:"东门小吃街的鸭腿传说",
-      desc:"傍晚，你溜达到学校东门的小吃街。\n\n烤鸭腿的香味穿过整条街飘过来。\n一个同学端着饭盒从你身边走过，嘴里念叨着：\n「今天这鸭腿可以，皮脆肉嫩，十六块值了。」\n\n你摸了摸口袋。十六块钱。\n脑海里浮现出金黄色的鸭腿在烤架上滋滋冒油的画面。",
+      title:"东门小吃街的鹅腿传说",
+      desc:"傍晚，你溜达到学校东门的小吃街。\n\n烤鹅腿的香味穿过整条街飘过来。\n一个同学端着饭盒从你身边走过，嘴里念叨着：\n「今天这鹅腿可以，皮脆肉嫩，十六块值了。」\n\n你摸了摸口袋。十六块钱。\n脑海里浮现出金黄色的鹅腿在烤架上滋滋冒油的画面。",
       buy:"买一个吃！（-¥16，心情 +3）",pass:"算了，忍住",
-      noMoney:"钱不够！你只能眼巴巴地看着鸭腿摊...",
-      ateText:"鸭腿外皮酥脆，肉质鲜嫩。你站在街边啃完，手指上全是油。满足。",
-      passText:"你闻了闻空气中的鸭腿香，转身走开了。"
+      noMoney:"钱不够！你只能眼巴巴地看着鹅腿摊...",
+      ateText:"鹅腿外皮酥脆，肉质鲜嫩。你站在街边啃完，手指上全是油。满足。",
+      passText:"你闻了闻空气中的鹅腿香，转身走开了。"
     },
     greenDuck:{
-      title:"绿色鸭腿事件",
-      desc:"今天你照常来到小吃街，照常买了鸭腿。\n\n但今天不一样——\n你咬下第一口后，发现鸭腿的肉是绿色的。\n\n那种绿，是不常见的暗绿，让你迟疑了一下。\n让你想起阅读题里代代相传的，死不瞑目的鱼眼里那道诡异的光。\n\n你愣住了。周围同学投来复杂的目光。\n你拍了照片。\n现在应该做什么——",
+      title:"绿色鹅腿事件",
+      desc:"今天你照常来到小吃街，照常买了鹅腿。\n\n但今天不一样——\n你咬下第一口后，发现鹅腿的肉是绿色的。\n\n那种绿，是不常见的暗绿，让你迟疑了一下。\n让你想起阅读题里代代相传的，死不瞑目的鱼眼里那道诡异的光。\n\n你愣住了。周围同学投来复杂的目光。\n你拍了照片。\n现在应该做什么——",
       ask:"联系阿姨问问怎么回事",noAsk:"算了，不联系",
       auntIntro:"阿姨擦了擦手，淡定地说：",
       auntReply:"「秘制绿色健康蔬菜汁腌制，纯天然，放心吃。」",
       ok:"\"好的好的\"",doubt:"\"我不信，这明明是坏的吧？\"",
-      noAskText:"你把绿色鸭腿扔进了垃圾桶。从此经过小吃街都会绕路走。",
+      noAskText:"你把绿色鹅腿扔进了垃圾桶。从此经过小吃街都会绕路走。",
       acceptText:"你默默接受了这个解释。绿色就绿色吧，味道其实还不错。",
-      doubtText:"阿姨皱起眉头：「小同学，你看我这摊子多少年了，还能骗你？」\n你张了张嘴，看着阿姨坚定的眼神，还是把鸭腿吃完了。\n不过心里总觉得哪里不太对。",
-      done:"鸭腿事件永久结束！"
+      doubtText:"阿姨皱起眉头：「小同学，你看我这摊子多少年了，还能骗你？」\n你张了张嘴，看着阿姨坚定的眼神，还是把鹅腿吃完了。\n不过心里总觉得哪里不太对。",
+      done:"鹅腿事件永久结束！"
     },
     fox:{
       title:"校门口的奇遇",
@@ -399,6 +410,8 @@ const STORY = {
       geniusNote:"（备注：难道你就是传说中的天才？）",
       scholarshipGrant:"连续通过两次测试！你获得了道具「三等奖学金」！",
       failTitle:"回家吧孩子回家吧",
+      wrongAnsTitle:"不会吧不会吧这都错",
+      retreatText:"你的学识不足以应对这次测试，直接判定不通过。",
       failSeizeText:"连续两次不通过。你所有的道具都被「没收」了。回家吧孩子，回家吧。",
       shieldText:"再帮你最后一次，爱你老己下次见",
       questions:[
@@ -408,7 +421,7 @@ const STORY = {
          opts:["A. 用一根香蕉和半瓶水占座一整天","B. 人走座留，天经地义","C. 用完即走，不长期占座","D. 贴纸条宣示永久主权"],ans:3},
         {q:"3. 收到「校园贷日息0.01%刷单返现」的链接，你应该？",
          opts:["A. 点进去看看能赚多少","B. 立即关闭，必要时举报","C. 转发给室友一起发财","D. 先借一点点试试水"],ans:2},
-        {q:"4. 买到一块肉质发绿的鸭腿，最稳妥的处理是？",
+        {q:"4. 买到一块肉质发绿的鹅腿，最稳妥的处理是？",
          opts:["A. 闭着眼睛吃完","B. 喂给不知情的室友","C. 找阿姨理论到底","D. 保留证据并反映情况"],ans:4},
         {q:"5. 「刀盾」在校园生活中的正确用途是？",
          opts:["A. 拿去食堂打饭","B. 隔空格挡抽象事件","C. 当镜子照","D. 卖给收废品的"],ans:2},
@@ -451,8 +464,9 @@ const STORY = {
   },
   endings:{
     fragile:{title:"脆皮大学生",text:["你倒下了。","过度劳累。熬夜。奔波。承受了太多抽象的场面。","倒下的那一刻你想：「明天一定早睡。」","但明天来的时候，你已经躺在医务室了。"]},
-    bankrupt:{title:"财务管理大师",text:["你的钱包空了。","也许是被骗的，也许是吃鸭腿吃光的，也许两者都有。","你坐在宿舍床上，翻出口袋里的钢镚。","「下次一定理性消费。」然后你去食堂蹭了顿免费汤。"]},
-    master:{title:"时间管理大师",text:["所有抽象体验，你一样不落。","鸭腿的绿色、占座的香蕉、图书馆的零食铺、","校门口的酱板鸭、聊天框里的诈骗链接……","两次随堂测试，你也都顺利通过了。","身心俱疲。但圆满收官。","你坐在天台上，风吹过脸庞。你笑了笑。","「这就是大学生活。还能更抽象一点吗？」"]}
+    bankrupt:{title:"财务管理大师",text:["你的钱包空了。","也许是被骗的，也许是吃鹅腿吃光的，也许两者都有。","你坐在宿舍床上，翻出口袋里的钢镚。","「下次一定理性消费。」然后你去食堂蹭了顿免费汤。"]},
+    master:{title:"时间管理大师",text:["所有抽象体验，你一样不落。","鹅腿的绿色、占座的香蕉、图书馆的零食铺、","校门口的酱板鸭、聊天框里的诈骗链接……","两次随堂测试，你也都顺利通过了。","身心俱疲。但圆满收官。","你坐在天台上，风吹过脸庞。你笑了笑。","「这就是大学生活。还能更抽象一点吗？」"]},
+    retreat:{title:"急流勇退",text:["你的心情再次跌到了谷底。","天台上吹过的风、教室里走过的神、小吃街飘过的香……","一切都变得模糊了。","你默默收拾了行李，头也不回地走出了校门。","退学一年。也许明年，你会重新来过。"]}
   }
 };
 
@@ -662,7 +676,7 @@ function statLog(label,delta,current,cls){
 function renderStatus(){
   const events=[
     {key:'apDone',label:'道歉事件'},{key:'soDone',label:'占座事件'},
-    {key:'cpDone',label:'情侣事件'},{key:'gdDone',label:'绿色鸭腿'},
+    {key:'cpDone',label:'情侣事件'},{key:'gdDone',label:'绿色鹅腿'},
     {key:'fxDone',label:'狐狸奇遇'},{key:'scDone',label:'网络诈骗'}
   ];
   let evHtml=events.map(e=>`<div class="event-chip ${P[e.key]?'done':'undone'}">${P[e.key]?'✓ ':''}${e.label}</div>`).join('');
@@ -690,7 +704,7 @@ function renderStatus(){
     <div class="story-card" style="margin-bottom:12px;">
       <div class="story-title">${escHtml(P.name)} 的状态</div>
       ${titleHtml}
-      <div style="margin-top:14px;color:var(--text3);font-size:13px;">道具: <span style="color:var(--purple)">${escHtml(itemsText)}</span> &nbsp;|&nbsp; 鸭腿×${P.dl} 自习×${P.st} 外出×${P.out} 聊天×${P.chat}</div>
+      <div style="margin-top:14px;color:var(--text3);font-size:13px;">道具: <span style="color:var(--purple)">${escHtml(itemsText)}</span> &nbsp;|&nbsp; 鹅腿×${P.dl} 自习×${P.st} 外出×${P.out} 聊天×${P.chat}</div>
     </div>
     ${quizHtml}
     <div class="status-grid">
@@ -798,7 +812,8 @@ const G = {
 
   runPhase(){
     // Check mood ≤ 0 before phase
-    if(P.mood<=0 && !P.rfDone){
+    if(P.mood<=0){
+      if(P.rfDone){G.triggerRetreat();return;}
       G.triggerRooftop(); return;
     }
     if(G.checkEnd()) return;
@@ -817,7 +832,10 @@ const G = {
 
   advanceAndRun(){
     // check end after phase action
-    if(P.mood<=0 && !P.rfDone){G.triggerRooftop();return;}
+    if(P.mood<=0){
+      if(P.rfDone){G.triggerRetreat();return;}
+      G.triggerRooftop();return;
+    }
     if(G.checkEnd()) return;
     G.nextPhase();
     G.runPhase();
@@ -885,10 +903,31 @@ const G = {
   // ── QUIZ ──
   triggerQuiz(qday){
     const q=STORY.events.quiz;
-    const qi=rnd(0,q.questions.length-1);
-    const qd=q.questions[qi];
     const reqKn=(qday===30)?28:60;
     const prefix=q.qPrefix.replace('{0}',qday);
+
+    // 学识不足：直接判定不通过，不显示题目
+    if(P.knowledge < reqKn){
+      if(qday===30) P.q30Done=true; else P.q60Done=true;
+      P.qFailStreak++;
+      P.title=q.failTitle;
+      let log=[
+        {text:prefix,cls:'t-yellow'},
+        {text:q.retreatText,cls:'t-red'},
+        {text:`（需要学识 ${reqKn}，当前: ${P.knowledge}）`,cls:'t-red'},
+        {text:`获得称号: ${q.failTitle}`,cls:'t-purple'}
+      ];
+      if(P.qFailStreak>=2){P.items=[];log.push({text:q.failSeizeText,cls:'t-red'});}
+      G.showResult({log,onContinue:()=>{
+        if(P.qFailStreak>=2){G.triggerRetreat();return;}
+        G.advanceAndRun();
+      }});
+      return;
+    }
+
+    // 学识足够：出题
+    const qi=rnd(0,q.questions.length-1);
+    const qd=q.questions[qi];
 
     renderCard({
       title:q.title,
@@ -896,7 +935,6 @@ const G = {
       desc:q.desc
     });
 
-    // Show quiz question with options
     let quizHtml=`<hr class="story-sep"><div class="quiz-q">${escHtml(prefix)}<br><br>${escHtml(qd.q)}</div><div class="quiz-opts">`;
     qd.opts.forEach((o,i)=>{
       quizHtml+=`<button class="quiz-opt" onclick="G.answerQuiz(${i+1},${qd.ans},${reqKn},${qday})">${escHtml(o)}</button>`;
@@ -912,7 +950,24 @@ const G = {
     const answerCorrect=(chosen===correct);
     const knowEnough=(P.knowledge>=reqKn);
 
-    if(answerCorrect && knowEnough){
+    // 学识不足：直接判定不通过，不显示题目（此处不应被调用，但作为安全网）
+    if(!knowEnough){
+      if(qday===30) P.q30Done=true; else P.q60Done=true;
+      P.qFailStreak++;
+      log.push({text:q.retreatText,cls:'t-red'});
+      log.push({text:`（需要学识 ${reqKn}，当前: ${P.knowledge}）`,cls:'t-red'});
+      P.title=q.failTitle;
+      log.push({text:`获得称号: ${q.failTitle}`,cls:'t-purple'});
+      if(P.qFailStreak>=2){P.items=[];log.push({text:q.failSeizeText,cls:'t-red'});}
+      G.showResult({log,onContinue:()=>{
+        if(P.qFailStreak>=2){G.triggerRetreat();return;}
+        G.advanceAndRun();
+      }});
+      return;
+    }
+
+    if(answerCorrect){
+      // 答对且学识足够：通过
       P.qFailStreak = 0;
       if(qday===30){P.q30Done=true;P.q30Pass=true;}else{P.q60Done=true;P.q60Pass=true;}
       P.title=q.geniusTitle;
@@ -920,26 +975,24 @@ const G = {
       log.push({text:`获得称号: ${q.geniusTitle}`,cls:'t-purple'});
       log.push({text:q.geniusNote,cls:'t-gray'});
       if(P.q30Pass && P.q60Pass){
-        // Remove old scholarship if exists, add new one
         P.items = P.items.filter(i=>i.type!=='scholarship');
         P.items.push({type:'scholarship',sealed:false});
         log.push({text:q.scholarshipGrant,cls:'t-yellow'});
       }
+      G.showResult({log,onContinue:()=>G.advanceAndRun()});
     } else {
+      // 学识足够但答错
       if(qday===30) P.q30Done=true; else P.q60Done=true;
       P.qFailStreak++;
       log.push({text:q.failText,cls:'t-red'});
-      if(answerCorrect && !knowEnough){
-        log.push({text:`虽然答对了，但你的学识不足（需要 ${reqKn}，当前: ${P.knowledge}）`,cls:'t-red'});
-      }
-      if(P.qFailStreak>=2){
-        P.title=q.failTitle;
-        log.push({text:`获得称号: ${q.failTitle}`,cls:'t-purple'});
-        P.items=[];
-        log.push({text:q.failSeizeText,cls:'t-red'});
-      }
+      P.title=q.wrongAnsTitle;
+      log.push({text:`获得称号: ${q.wrongAnsTitle}`,cls:'t-purple'});
+      if(P.qFailStreak>=2){P.items=[];log.push({text:q.failSeizeText,cls:'t-red'});}
+      G.showResult({log,onContinue:()=>{
+        if(P.qFailStreak>=2){G.triggerRetreat();return;}
+        G.advanceAndRun();
+      }});
     }
-    G.showResult({log,onContinue:()=>G.advanceAndRun()});
   },
 
   // ── AFTERNOON ──
@@ -1021,8 +1074,8 @@ const G = {
   phaseEvening(){
     P.out++;
     const ev=STORY.events;
-    // Day 3 fox event (must be exactly day 3, matching C++ logic)
-    if(G.day===3 && !P.fxDone){G.triggerFox();return;}
+    // Fox event on multiples of 5
+    if(G.day%5===0&&!P.fxDone){G.triggerFox();return;}
     // Duck leg events
     if(!P.dlDone&&Math.random()<0.4){
       if(P.dl>=3){G.triggerGreenDuck();}
@@ -1046,7 +1099,7 @@ const G = {
         else{P.money-=16;P.dl++;P.mood=clamp(P.mood+3,0,S.maxStat);
           log.push(statLog('心情',+3,P.mood,'t-green'));
           log.push({text:`金钱 -16（剩余: ¥${P.money}）`,cls:'t-cyan'});
-          log.push({text:`已吃鸭腿: ${P.dl}`,cls:'t-yellow'});
+          log.push({text:`已吃鹅腿: ${P.dl}`,cls:'t-yellow'});
           log.push({text:ev.ateText,cls:'t-gray'});}
       } else {log.push({text:ev.passText,cls:'t-gray'});}
       G.showResult({log,onContinue:()=>G.advanceAndRun()});
@@ -1200,6 +1253,7 @@ const G = {
   checkEnd(){
     if(P.energy<=0){G.triggerEnding('fragile');return true;}
     if(P.money<=0){G.triggerEnding('bankrupt');return true;}
+    if(P.mood<=0&&P.rfDone){G.triggerRetreat();return true;}
     // Master: mood≤10 & energy≤10, all events done, both quizzes passed (matching C++ chk())
     if(P.mood<=10&&P.energy<=10&&P.gdDone&&P.soDone&&P.cpDone&&P.fxDone&&P.scDone&&quizPassed()){G.triggerEnding('master');return true;}
     return false;
@@ -1207,13 +1261,29 @@ const G = {
 
   triggerEnding(type){
     const ed=STORY.endings[type];
-    const colorMap={fragile:'t-red',bankrupt:'t-red',master:'t-green'};
+    const colorMap={fragile:'t-red',bankrupt:'t-red',master:'t-green',retreat:'t-red'};
     let textHtml=ed.text.map(t=>`<p>${escHtml(t)}</p>`).join('');
     let statsHtml=`<div class="ending-stats">存活天数 <span>${G.day} 天</span>`;
     if(P.title) statsHtml+=` &nbsp;|&nbsp; 称号 <span>${escHtml(P.title)}</span>`;
     statsHtml+='</div>';
     document.getElementById('ending-box').innerHTML=`
       <div class="ending-title ${colorMap[type]}">「${escHtml(ed.title)}」</div>
+      <div class="ending-sub">GAME OVER</div>
+      ${statsHtml}
+      <div class="ending-text">${textHtml}</div>
+      <button class="btn accent" onclick="showScreen('s-menu')">返回主菜单</button>
+    `;
+    showScreen('s-ending');
+  },
+
+  triggerRetreat(){
+    const ed=STORY.endings.retreat;
+    let textHtml=ed.text.map(t=>`<p>${escHtml(t)}</p>`).join('');
+    let statsHtml=`<div class="ending-stats">存活天数 <span>${G.day} 天</span>`;
+    if(P.title) statsHtml+=` &nbsp;|&nbsp; 称号 <span>${escHtml(P.title)}</span>`;
+    statsHtml+='</div>';
+    document.getElementById('ending-box').innerHTML=`
+      <div class="ending-title t-red">「${escHtml(ed.title)}」</div>
       <div class="ending-sub">GAME OVER</div>
       ${statsHtml}
       <div class="ending-text">${textHtml}</div>
