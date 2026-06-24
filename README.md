@@ -50,7 +50,6 @@ EgaoCampus/
 ├── html_version/          # Web version (data-engine separated)
 │   ├── index.html         # Game engine & UI (driver)
 │   ├── story.js           # Story data as JS (loaded via <script> tag)
-│   ├── story.json         # Same data in JSON format (reference / C++ shared)
 │   └── game_web.html      # Legacy monolithic version (v4.0, kept for reference)
 ├── cpp_version/           # C++ console version
 │   ├── game.cpp           # Game engine (~700 lines)
