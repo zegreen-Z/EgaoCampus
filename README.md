@@ -82,3 +82,5 @@ The web version loads story data from `story.js` via a `<script>` tag rather tha
 ## License
 
 This is a personal project for learning and fun. Use freely.
+
+##**Status: Final exam period — partial files pending. Full update coming this summer.**
