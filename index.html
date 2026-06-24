@@ -61,6 +61,7 @@
   .day-phase{font-size:14px;font-weight:600;color:var(--cyan);}
   .header-right{display:flex;gap:8px;align-items:center;}
   .ks-badge{background:var(--purple-dim);border:1px solid var(--purple);color:var(--purple);border-radius:4px;padding:2px 8px;font-size:12px;}
+  .ks-badge.gold{border-color:var(--yellow);color:var(--yellow);background:var(--yellow-dim);}
 
   /* ── STORY CARD ── */
   .story-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:12px;}
@@ -91,6 +92,12 @@
   .t-purple{color:var(--purple);}
   .t-gray{color:var(--gray);}
 
+  /* ── QUIZ ── */
+  .quiz-q{font-size:15px;color:var(--white);margin-bottom:14px;line-height:1.8;}
+  .quiz-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:4px;}
+  .quiz-opt{display:block;width:100%;padding:11px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;font-size:14px;font-family:inherit;text-align:left;transition:all .15s;}
+  .quiz-opt:hover{background:var(--bg4);border-color:var(--accent2);color:var(--white);}
+
   /* ── STATUS SCREEN ── */
   .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
   .status-cell{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;}
@@ -102,6 +109,11 @@
   .event-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;text-align:center;font-size:12px;}
   .event-chip.done{border-color:var(--green2);background:var(--green-dim);color:var(--green);}
   .event-chip.undone{color:var(--text3);}
+  .quiz-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+  .quiz-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;text-align:center;font-size:12px;}
+  .quiz-chip.pass{border-color:var(--yellow);background:var(--yellow-dim);color:var(--yellow);}
+  .quiz-chip.fail{border-color:var(--red);background:var(--red-dim);color:var(--red);}
+  .quiz-chip.pending{color:var(--text3);}
 
   /* ── HELP ── */
   .help-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
@@ -163,7 +175,7 @@
       <button class="btn cyan" onclick="showScreen('s-help')">游戏说明</button>
       <button class="btn red" onclick="if(confirm('确定退出？'))window.close()">退出游戏</button>
     </div>
-    <div class="menu-version">v4.0 Web Edition · 基于 story.json</div>
+    <div class="menu-version">v5.0 Web Edition · 基于 story.json</div>
   </div>
 </div>
 
@@ -183,17 +195,24 @@
       <div class="help-row"><span class="help-key t-green">心情</span><span>归零触发天台吹风（仅一次），再归零则脆皮结局</span></div>
       <div class="help-row"><span class="help-key t-yellow">精力</span><span>归零即「脆皮大学生」结局</span></div>
       <div class="help-row"><span class="help-key t-cyan">金钱</span><span>归零即「财务管理大师」结局</span></div>
-      <div class="help-row"><span class="help-key t-purple">学识</span><span>上课认真听讲或熬夜学习可提升</span></div>
+      <div class="help-row"><span class="help-key t-purple">学识</span><span>上课认真听讲或熬夜学习可提升。随堂测试需要学识达标（≥28/≥60）</span></div>
+    </div>
+    <div class="help-section">
+      <h3>随堂测试</h3>
+      <div class="help-row"><span class="help-key t-yellow">第30天</span><span>上午触发，需学识≥28并通过答题。通过获得「难ta天」称号</span></div>
+      <div class="help-row"><span class="help-key t-yellow">第60天</span><span>上午触发，需学识≥60并通过答题。连续两次通过获得「三等奖学金」</span></div>
+      <div class="help-row"><span class="help-key t-red">惩罚</span><span>连续两次不通过测试：没收所有道具 + 称号「回家吧孩子回家吧」</span></div>
     </div>
     <div class="help-section">
       <h3>道具</h3>
       <div class="help-row"><span class="help-key t-purple">刀盾(耐3)</span><span>在道歉事件和占座事件中可免疫损失</span></div>
+      <div class="help-row"><span class="help-key t-yellow">三等奖学金</span><span>抵御一次网络诈骗（金钱无损），使用后封印。连续通过两次测试获得</span></div>
     </div>
     <div class="help-section">
       <h3>结局条件</h3>
       <div class="help-row"><span class="help-key t-red">脆皮结局</span><span>精力 ≤ 0</span></div>
       <div class="help-row"><span class="help-key t-red">破产结局</span><span>金钱 = 0</span></div>
-      <div class="help-row"><span class="help-key t-green">大师结局</span><span>心情&精力均≤5 且 完成所有主线事件</span></div>
+      <div class="help-row"><span class="help-key t-green">大师结局</span><span>心情≤10 精力≤10 且 完成所有事件（含两次测试通过）</span></div>
     </div>
     <button class="btn" onclick="showScreen('s-menu')">返回主菜单</button>
   </div>
@@ -244,6 +263,7 @@
     <div class="day-phase" id="day-phase-label">第1天 · 上午 · 上课</div>
     <div class="header-right">
       <span class="ks-badge" id="ks-badge" style="display:none;">刀盾 <span id="ks-dur">3</span></span>
+      <span class="ks-badge gold" id="sc-badge" style="display:none;">奖学金</span>
       <button class="btn-sm" onclick="G.openStatus()">状态</button>
       <button class="btn-sm" onclick="G.openSave()">存档</button>
     </div>
@@ -359,12 +379,40 @@ const STORY = {
       title:"突如其来的链接",
       desc:"你在群里正聊得开心，突然收到一条私信。\n\n「同学你好！校园贷新活动，日息低至0.01%，\n  还有刷单返现兼职，每天稳赚500+！」\n\n后面跟着一个链接。\n你本来想忽略的，但手指一滑——点开了。\n\n页面一闪。你的心跳漏了一拍。",
       detail1:"页面上的数字跳动了几下，然后你的余额少了一大截。",
-      detail2:"你再点那个链接，已经打不开了。"
+      detail2:"你再点那个链接，已经打不开了。",
+      shieldText:"网络诈骗被「三等奖学金」抵御！金钱无损，游戏继续。"
     },
     rooftop:{
       title:"顶楼的微风",
       desc:"你独自走上了教学楼的天台。\n\n门没有锁。也许从来就没锁过。\n\n风很大，吹过你的脸颊，带着远处小吃街隐约的烟火气。\n从这里能看见整个校园——\n图书馆灯火通明，操场上有人夜跑，\n宿舍楼的窗户里透出各种颜色的光。\n\n一切都在照常运转。\n你趴在栏杆上，深深的吸了一口气。\n\n好像……也没那么糟。",
       after:"你在天台上站了很久。风慢慢吹干了眼角的湿意。\n等你转身下楼时，天已经黑透了。今天就这样过去吧。"
+    },
+    quiz:{
+      title:"随堂测试",
+      desc:"老师推了推眼镜，清了清嗓子。\n\n「同学们，今天我们来进行一次随堂测试。」\n教室里响起一片哀嚎。\n「安静！都给我打起精神来。」\n你捏紧了手里的笔。",
+      qPrefix:"【随堂测试 · 第{0}天】",
+      passText:"你顺利答完了所有题目，交卷的时候手都不抖。\n老师看了你的卷子，沉默了几秒，然后缓缓点头。",
+      failText:"你盯着卷子上的题目，大脑一片空白。\n交卷的时候，你觉得自己像是来凑人数的。",
+      geniusTitle:"难ta天",
+      geniusNote:"（备注：难道你就是传说中的天才？）",
+      scholarshipGrant:"连续通过两次测试！你获得了道具「三等奖学金」！",
+      failTitle:"回家吧孩子回家吧",
+      failSeizeText:"连续两次不通过。你所有的道具都被「没收」了。回家吧孩子，回家吧。",
+      shieldText:"再帮你最后一次，爱你老己下次见",
+      questions:[
+        {q:"1. 下列哪种行为最有助于大学生保持身心健康？",
+         opts:["A. 熬夜到凌晨三点然后翘早八","B. 合理作息，适度运动","C. 一天三顿外卖配全糖奶茶","D. 期中前夜通宵突击"],ans:2},
+        {q:"2. 在图书馆自习，正确的做法是？",
+         opts:["A. 用一根香蕉和半瓶水占座一整天","B. 人走座留，天经地义","C. 用完即走，不长期占座","D. 贴纸条宣示永久主权"],ans:3},
+        {q:"3. 收到「校园贷日息0.01%刷单返现」的链接，你应该？",
+         opts:["A. 点进去看看能赚多少","B. 立即关闭，必要时举报","C. 转发给室友一起发财","D. 先借一点点试试水"],ans:2},
+        {q:"4. 买到一块肉质发绿的鸭腿，最稳妥的处理是？",
+         opts:["A. 闭着眼睛吃完","B. 喂给不知情的室友","C. 找阿姨理论到底","D. 保留证据并反映情况"],ans:4},
+        {q:"5. 「刀盾」在校园生活中的正确用途是？",
+         opts:["A. 拿去食堂打饭","B. 隔空格挡抽象事件","C. 当镜子照","D. 卖给收废品的"],ans:2},
+        {q:"6. 大学生精力归零会导致什么结局？",
+         opts:["A. 财务管理大师","B. 时间管理大师","C. 脆皮大学生","D. 狐仙恩人"],ans:3}
+      ]
     }
   },
   phases:{
@@ -402,7 +450,7 @@ const STORY = {
   endings:{
     fragile:{title:"脆皮大学生",text:["你倒下了。","过度劳累。熬夜。奔波。承受了太多抽象的场面。","倒下的那一刻你想：「明天一定早睡。」","但明天来的时候，你已经躺在医务室了。"]},
     bankrupt:{title:"财务管理大师",text:["你的钱包空了。","也许是被骗的，也许是吃鸭腿吃光的，也许两者都有。","你坐在宿舍床上，翻出口袋里的钢镚。","「下次一定理性消费。」然后你去食堂蹭了顿免费汤。"]},
-    master:{title:"时间管理大师",text:["所有抽象体验，你一样不落。","鸭腿的绿色、占座的香蕉、图书馆的零食铺、","校门口的酱板鸭、聊天框里的诈骗链接……","身心俱疲。但圆满收官。","你坐在天台上，风吹过脸庞。你笑了笑。","「这就是大学生活。还能更抽象一点吗？」"]}
+    master:{title:"时间管理大师",text:["所有抽象体验，你一样不落。","鸭腿的绿色、占座的香蕉、图书馆的零食铺、","校门口的酱板鸭、聊天框里的诈骗链接……","两次随堂测试，你也都顺利通过了。","身心俱疲。但圆满收官。","你坐在天台上，风吹过脸庞。你笑了笑。","「这就是大学生活。还能更抽象一点吗？」"]}
   }
 };
 
@@ -429,15 +477,43 @@ let P = null;
 function newPlayer(name){
   return {
     name, mood:S.initMood, energy:S.initEnergy, money:S.initMoney, knowledge:0,
-    ksDur:S.knifeDurability,
+    items:[{type:'knifeShield',dur:S.knifeDurability}],
     dl:0,st:0,out:0,chat:0,
     dlDone:false,gdDone:false,soDone:false,cpDone:false,
     fxDone:false,scDone:false,rfDone:false,apDone:false,
+    q30Done:false, q60Done:false, q30Pass:false, q60Pass:false, qFailStreak:0,
     title:'',ksShown:false
   };
 }
-function hasKS(){return P&&P.ksDur>0;}
-function useKS(){if(hasKS()) P.ksDur--;}
+
+// ── Item helpers ──
+function hasKS(){ return P&&P.items.some(i=>i.type==='knifeShield'&&i.dur>0); }
+function getKS(){ return P&&P.items.find(i=>i.type==='knifeShield'&&i.dur>0)||null; }
+function hasScholarship(){ return P&&P.items.some(i=>i.type==='scholarship'&&!i.sealed); }
+function getScholarship(){ return P&&P.items.find(i=>i.type==='scholarship'&&!i.sealed)||null; }
+
+// useKS: returns {shattered:bool} or null if no KS
+function useKS(){
+  const ks = getKS();
+  if(!ks) return null;
+  ks.dur--;
+  let shattered = false;
+  if(ks.dur<=0){
+    if(!P.ksShown){ P.ksShown = true; shattered = true; }
+    P.items = P.items.filter(i=>!(i.type==='knifeShield'&&i.dur<=0));
+  }
+  return {shattered};
+}
+
+// useScholarship: seals it, returns true if used
+function useScholarship(){
+  const sc = getScholarship();
+  if(!sc) return false;
+  sc.sealed = true;
+  return true;
+}
+
+function quizPassed(){ return P&&P.q30Pass&&P.q60Pass; }
 
 // ══════════════════════════════════════════
 //  SAVE / LOAD  (localStorage)
@@ -453,12 +529,31 @@ function loadFromSlot(slot){
 }
 function delSlot(slot){localStorage.removeItem('campus_save_'+slot);}
 
+// Upgrade old save format to v5
+function upgradeSaveData(playerData){
+  // If old format used ksDur, convert to items array
+  if(playerData.ksDur !== undefined && !playerData.items){
+    playerData.items = [{type:'knifeShield',dur:playerData.ksDur}];
+    delete playerData.ksDur;
+  }
+  // Ensure items exists
+  if(!playerData.items) playerData.items = [{type:'knifeShield',dur:S.knifeDurability}];
+  // Add missing quiz fields
+  if(playerData.q30Done === undefined) playerData.q30Done = false;
+  if(playerData.q60Done === undefined) playerData.q60Done = false;
+  if(playerData.q30Pass === undefined) playerData.q30Pass = false;
+  if(playerData.q60Pass === undefined) playerData.q60Pass = false;
+  if(playerData.qFailStreak === undefined) playerData.qFailStreak = 0;
+  return playerData;
+}
+
 function renderLoadSlots(){
   const el=document.getElementById('save-slots-load');
   let html='';
   for(let i=1;i<=3;i++){
     const d=loadFromSlot(i);
     if(d){
+      upgradeSaveData(d.player);
       html+=`<div class="save-slot">
         <div class="save-info">
           <div class="save-name">槽位 ${i} — ${d.player.name}</div>
@@ -511,8 +606,11 @@ function updateHUD(){
   document.getElementById('b-mood').style.width=(P.mood/S.maxStat*100)+'%';
   document.getElementById('b-nrg').style.width=(P.energy/S.maxStat*100)+'%';
   const ksb=document.getElementById('ks-badge');
-  if(hasKS()){ksb.style.display='';document.getElementById('ks-dur').textContent=P.ksDur;}
+  const scb=document.getElementById('sc-badge');
+  if(hasKS()){ksb.style.display='';document.getElementById('ks-dur').textContent=getKS().dur;}
   else ksb.style.display='none';
+  if(hasScholarship()){scb.style.display='';}
+  else scb.style.display='none';
 }
 
 function gameContent(){return document.getElementById('game-content');}
@@ -558,13 +656,31 @@ function renderStatus(){
   ];
   let evHtml=events.map(e=>`<div class="event-chip ${P[e.key]?'done':'undone'}">${P[e.key]?'✓ ':''}${e.label}</div>`).join('');
   let titleHtml=P.title?`<div class="title-badge">称号: ${escHtml(P.title)}</div>`:'';
-  let ksText=hasKS()?`刀盾 [耐久 ${P.ksDur}]`:'(已损毁)';
+
+  // Quiz status
+  let q30Label='未触发', q30Cls='pending';
+  if(P.q30Done){q30Label=P.q30Pass?'测试1 通过':'测试1 未过'; q30Cls=P.q30Pass?'pass':'fail';}
+  let q60Label='未触发', q60Cls='pending';
+  if(P.q60Done){q60Label=P.q60Pass?'测试2 通过':'测试2 未过'; q60Cls=P.q60Pass?'pass':'fail';}
+  let quizHtml=`<div class="quiz-grid">
+    <div class="quiz-chip ${q30Cls}">${q30Label}</div>
+    <div class="quiz-chip ${q60Cls}">${q60Label}</div>
+  </div>`;
+
+  // Items list
+  let itemsText = P.items.map(i=>{
+    if(i.type==='knifeShield') return `刀盾 [耐久 ${i.dur}]`;
+    if(i.type==='scholarship') return `三等奖学金 [${i.sealed?'已封印':'可用'}]`;
+    return i.type;
+  }).join(', ') || '(空)';
+
   document.getElementById('status-content').innerHTML=`
     <div class="story-card" style="margin-bottom:12px;">
       <div class="story-title">${escHtml(P.name)} 的状态</div>
       ${titleHtml}
-      <div style="margin-top:14px;color:var(--text3);font-size:13px;">道具: <span style="color:var(--purple)">${escHtml(ksText)}</span> &nbsp;|&nbsp; 鸭腿×${P.dl} 自习×${P.st} 外出×${P.out} 聊天×${P.chat}</div>
+      <div style="margin-top:14px;color:var(--text3);font-size:13px;">道具: <span style="color:var(--purple)">${escHtml(itemsText)}</span> &nbsp;|&nbsp; 鸭腿×${P.dl} 自习×${P.st} 外出×${P.out} 聊天×${P.chat}</div>
     </div>
+    ${quizHtml}
     <div class="status-grid">
       <div class="status-cell">
         <div class="status-cell-label">心情</div>
@@ -609,7 +725,7 @@ const G = {
   loadSlot(slot){
     const d=loadFromSlot(slot);
     if(!d){alert('存档读取失败');return;}
-    P=d.player;
+    P=upgradeSaveData(d.player);
     G.day=d.day; G.phase=d.phase||'morning';
     G._pendingLog=[]; G._stageState={};
     showScreen('s-game');
@@ -697,6 +813,11 @@ const G = {
 
   // ── MORNING ──
   phaseMorning(){
+    // Quiz check: day 30 or day 60
+    if((G.day===30 && !P.q30Done) || (G.day===60 && !P.q60Done)){
+      G.triggerQuiz(G.day); return;
+    }
+
     renderCard({
       title: STORY.scenes.morning,
       titleColor:'cyan',
@@ -714,7 +835,6 @@ const G = {
 
       // Maybe trigger apology event
       if(!P.apDone && Math.random()<0.3){
-        // show apology trigger
         G._pendingLog=log;
         G._stageState={attentive};
         renderCard({
@@ -730,10 +850,11 @@ const G = {
         G._nextAction=(ch2)=>{
           let log2=[];
           if(hasKS()&&ch2===1){
-            useKS(); P.apDone=true;
+            const result=useKS(); P.apDone=true;
+            const ks=getKS()||{dur:0};
             log2.push({text:STORY.events.apology.shieldUse,cls:'t-green'});
-            log2.push({text:`刀盾耐久 -1（剩余: ${P.ksDur}）`,cls:'t-yellow'});
-            if(!hasKS()&&!P.ksShown){P.ksShown=true;log2.push({text:STORY.meta.knifeShattered,cls:'t-purple'});}
+            log2.push({text:`刀盾耐久 -1（剩余: ${ks.dur}）`,cls:'t-yellow'});
+            if(result&&result.shattered) log2.push({text:STORY.meta.knifeShattered,cls:'t-purple'});
           } else {
             P.apDone=true; P.mood=clamp(P.mood-5,0,S.maxStat);
             log2.push(statLog('心情',-5,P.mood,'t-red'));
@@ -747,6 +868,66 @@ const G = {
       const arr=attentive?STORY.phases.morningAttentive:STORY.phases.morningPeace;
       G.showResult({log,after:pick(arr),onContinue:()=>G.advanceAndRun()});
     };
+  },
+
+  // ── QUIZ ──
+  triggerQuiz(qday){
+    const q=STORY.events.quiz;
+    const qi=rnd(0,q.questions.length-1);
+    const qd=q.questions[qi];
+    const reqKn=(qday===30)?28:60;
+    const prefix=q.qPrefix.replace('{0}',qday);
+
+    renderCard({
+      title:q.title,
+      titleColor:'yellow',
+      desc:q.desc
+    });
+
+    // Show quiz question with options
+    let quizHtml=`<hr class="story-sep"><div class="quiz-q">${escHtml(prefix)}<br><br>${escHtml(qd.q)}</div><div class="quiz-opts">`;
+    qd.opts.forEach((o,i)=>{
+      quizHtml+=`<button class="quiz-opt" onclick="G.answerQuiz(${i+1},${qd.ans},${reqKn},${qday})">${escHtml(o)}</button>`;
+    });
+    quizHtml+=`</div>`;
+    gameContent().innerHTML+=quizHtml;
+    updateHUD();
+  },
+
+  answerQuiz(chosen,correct,reqKn,qday){
+    const q=STORY.events.quiz;
+    let log=[];
+    const answerCorrect=(chosen===correct);
+    const knowEnough=(P.knowledge>=reqKn);
+
+    if(answerCorrect && knowEnough){
+      P.qFailStreak = 0;
+      if(qday===30){P.q30Done=true;P.q30Pass=true;}else{P.q60Done=true;P.q60Pass=true;}
+      P.title=q.geniusTitle;
+      log.push({text:q.passText,cls:'t-green'});
+      log.push({text:`获得称号: ${q.geniusTitle}`,cls:'t-purple'});
+      log.push({text:q.geniusNote,cls:'t-gray'});
+      if(P.q30Pass && P.q60Pass){
+        // Remove old scholarship if exists, add new one
+        P.items = P.items.filter(i=>i.type!=='scholarship');
+        P.items.push({type:'scholarship',sealed:false});
+        log.push({text:q.scholarshipGrant,cls:'t-yellow'});
+      }
+    } else {
+      if(qday===30) P.q30Done=true; else P.q60Done=true;
+      P.qFailStreak++;
+      log.push({text:q.failText,cls:'t-red'});
+      if(answerCorrect && !knowEnough){
+        log.push({text:`虽然答对了，但你的学识不足（需要 ${reqKn}，当前: ${P.knowledge}）`,cls:'t-red'});
+      }
+      if(P.qFailStreak>=2){
+        P.title=q.failTitle;
+        log.push({text:`获得称号: ${q.failTitle}`,cls:'t-purple'});
+        P.items=[];
+        log.push({text:q.failSeizeText,cls:'t-red'});
+      }
+    }
+    G.showResult({log,onContinue:()=>G.advanceAndRun()});
   },
 
   // ── AFTERNOON ──
@@ -795,17 +976,19 @@ const G = {
     G._nextAction=(ch)=>{
       let log=[];
       if(hasKS()&&ch===1){
-        useKS(); P.energy=clamp(P.energy-5,0,S.maxStat); P.mood=clamp(P.mood+5,0,S.maxStat);
+        const result=useKS(); P.energy=clamp(P.energy-5,0,S.maxStat); P.mood=clamp(P.mood+5,0,S.maxStat);
         log.push(statLog('精力',-5,P.energy,'t-red'));
         log.push(statLog('心情',+5,P.mood,'t-green'));
-        log.push({text:`刀盾耐久 -1（剩余: ${P.ksDur}）`,cls:'t-yellow'});
+        const ks=getKS()||{dur:0};
+        log.push({text:`刀盾耐久 -1（剩余: ${ks.dur}）`,cls:'t-yellow'});
         log.push({text:ev.clearText,cls:'t-green'});
+        if(result&&result.shattered) log.push({text:STORY.meta.knifeShattered,cls:'t-purple'});
       } else {
         P.energy=clamp(P.energy-10,0,S.maxStat);
         log.push(statLog('精力',-10,P.energy,'t-red'));
         log.push({text:ev.moveText,cls:'t-gray'});
+        if(!hasKS()&&!P.ksShown){P.ksShown=true;log.push({text:STORY.meta.knifeShattered,cls:'t-purple'});}
       }
-      if(!hasKS()&&!P.ksShown){P.ksShown=true;log.push({text:STORY.meta.knifeShattered,cls:'t-purple'});}
       G.showResult({log,onContinue:()=>G.advanceAndRun()});
     };
   },
@@ -826,8 +1009,8 @@ const G = {
   phaseEvening(){
     P.out++;
     const ev=STORY.events;
-    // Day 3+ fox event
-    if(G.day>=3&&!P.fxDone){G.triggerFox();return;}
+    // Day 3 fox event (must be exactly day 3, matching C++ logic)
+    if(G.day===3 && !P.fxDone){G.triggerFox();return;}
     // Duck leg events
     if(!P.dlDone&&Math.random()<0.4){
       if(P.dl>=3){G.triggerGreenDuck();}
@@ -960,6 +1143,20 @@ const G = {
   triggerScam(){
     P.scDone=true;
     const ev=STORY.events.scam;
+
+    // Check scholarship first (matching C++ ScamEvent logic)
+    if(hasScholarship()){
+      useScholarship();
+      renderCard({title:ev.title,titleColor:'red',desc:ev.desc,
+        log:[
+          {text:STORY.events.quiz.shieldText,cls:'t-purple'},
+          {text:ev.shieldText,cls:'t-green'},
+          {text:'「三等奖学金」已封印，此后不可再用。',cls:'t-yellow'}
+        ],choices:[{label:'继续'}]});
+      G._nextAction=()=>G.advanceAndRun();
+      return;
+    }
+
     const loss=rnd(S.scamMinLoss,S.scamMaxLoss);
     const before=P.money; P.money=Math.max(0,P.money-loss); const actual=before-P.money;
     P.mood=clamp(P.mood-10,0,S.maxStat);
@@ -991,8 +1188,8 @@ const G = {
   checkEnd(){
     if(P.energy<=0){G.triggerEnding('fragile');return true;}
     if(P.money<=0){G.triggerEnding('bankrupt');return true;}
-    // Master: low mood & energy, all main events done
-    if(P.mood<=5&&P.energy<=5&&P.gdDone&&P.soDone&&P.cpDone&&P.fxDone&&P.scDone){G.triggerEnding('master');return true;}
+    // Master: mood≤10 & energy≤10, all events done, both quizzes passed (matching C++ chk())
+    if(P.mood<=10&&P.energy<=10&&P.gdDone&&P.soDone&&P.cpDone&&P.fxDone&&P.scDone&&quizPassed()){G.triggerEnding('master');return true;}
     return false;
   },
 
