@@ -1,4 +1,4 @@
-# Campus Abstract Simulator (校园抽象模拟器)
+# Campus Abstract Simulator 
 
 A text-based college life simulation game where every day is a little absurd. Attend lectures, eat mysterious duck legs, encounter strange people at the school gate, and try to survive 60 days without running out of mood, energy, or money.
 
@@ -31,7 +31,7 @@ Pop quizzes on Day 30 and Day 60 test your knowledge. You need ≥28 knowledge f
 
 ### Items
 
-- **Knife-Shield** (durability 3) — blocks damage in the Apology and Seat events.
+- **Knife-Shield(刀盾)** (durability 3) — blocks damage in the Apology and Seat events.
 - **Third-Class Scholarship** — absorbs one scam attack, then gets sealed. Earned by passing both quizzes.
 
 ### Endings
@@ -65,6 +65,11 @@ The web version loads story data from `story.js` via a `<script>` tag rather tha
 - **C++ version**: MSVC, nlohmann/json, Windows console (requires UTF-8 BOM for Chinese literals)
 - **HTML version**: Vanilla HTML/CSS/JS, no frameworks or build tools
 
+## Future plans
+-[]add English-language JS/JSON files (inspire by friend B)
+-[]improve the game caching mechanism
+-[]refine the exit button settings
+
 ## Recent Updates
 
 ### v5.0 — 2026-06-24
@@ -83,4 +88,4 @@ The web version loads story data from `story.js` via a `<script>` tag rather tha
 
 This is a personal project for learning and fun. Use freely.
 
-##**Status: Final exam period — partial files pending. Full update coming this summer.**
+**Status: Final exam period — partial files pending. Full update coming this summer.**
