@@ -66,9 +66,11 @@ The web version loads story data from `story.js` via a `<script>` tag rather tha
 - **HTML version**: Vanilla HTML/CSS/JS, no frameworks or build tools
 
 ## Future plans
--[]add English-language JS/JSON files (inspire by friend B)
--[]improve the game caching mechanism
--[]refine the exit button settings
+- [ ] add English-language JS/JSON files (inspire by friend B)
+- [ ] improve the game caching mechanism
+- [ ] refine the exit button settings
+- [ ] Add more daily events (e.g., events that cost money)(inspire by friend S)
+- [ ] Add an entrance test: players answer five multiple-choice questions; based on their accuracy, they are placed into either a junior college (3 years, 6 semesters, 6 exams) or a university (4 years, 8 semesters, 8 exams)
 
 ## Recent Updates
 
